@@ -12,23 +12,82 @@ export const ADD_NEW_COMMENT= 'ADD_NEW_COMMENT'
 export const EDIT_COMMENT = 'EDIT_COMMENT'
 export const DELETE_COMMENT = 'DELETE_COMMENT '
 
+const BASE_URL = "http://localhost:5001/"
 
+//Network Requests
 export function loadCategoriesRequest(){
+    return (dispatch, getState) => {
+        if (getState().categories!=null){
+            let categories = [];    
+            console.log(BASE_URL+'categories');
+            fetch(BASE_URL+'categories', 
+            { 
+                headers: { 
+                    'Authorization': 'whatever-you-want' 
+                }})        
+            .then(categories => dispatch(loadCategories(categories)));
+        }
+    }
+}
 
+export function loadPostsRequest({category}){
+    return (dispatch, getState) => {
+        if (getState().posts[category]!=null){
+            let posts = [];
+            dispatch(loadPosts(posts));
+        }
+    }
+}
+
+export function addPostRequest({post}){
+    return (dispatch, getState) => {
+            dispatch(addPost(post));
+    }
+}
+
+export function editPostRequest({post}){
+    return (dispatch, getState) => {
+            dispatch(editPost(post));
+    }
+}
+
+export function deletePostRequest({id}){
+    return (dispatch, getState) => {
+            dispatch(deletePost(id));
+    }
+}
+
+export function loadCommentsRequest({post}){
+    return (dispatch, getState) => {
+        if (getState().comments[post]!=null){
+            let comments = [];
+            dispatch(loadComments(comments));
+        }
+    }
+}
+
+export function addCommentRequest({comment}){
+    return (dispatch, getState) => {
+            dispatch(addComment(comment));
+    }
+}
+
+export function editCommentRequest({comment}){
+    return (dispatch, getState) => {
+            dispatch(addComment(comment));
+    }
+}
+
+export function deleteCommentRequest({id}){
+    return (dispatch, getState) => {
+        
+    }
 }
 
 export function loadCategories({categories}){
     return {
         type: LOAD_CATEGORIES,
         categories
-    }
-}
-
-export function loadPostsRequest({category}){
-    return (dispatch, getState) => {
-        if (getState().categories!=null){
-            dispatch(getState().categories);
-        }
     }
 }
 
@@ -63,7 +122,21 @@ export function deletePost({id}){
 export function addPost({post}){
     return {
         type: ADD_NEW_POST,
-        id
+        id: post.id
+    }
+}
+
+export function loadComments({comments}){
+    return {
+        type: LOAD_COMMENTS,
+        comments
+    }
+}
+
+export function sortComments({sortBy}){
+    return {
+        type: SORT_COMMENTS_BY,
+        sortBy
     }
 }
 
@@ -73,3 +146,18 @@ export function editComment({comment}){
         comment
     }
 }
+
+export function deleteComment({id}){
+    return {
+        type: DELETE_COMMENT,
+        id
+    }
+}
+
+export function addComment({comment}){
+    return {
+        type: ADD_NEW_COMMENT,
+        id: comment.id
+    }
+}
+
