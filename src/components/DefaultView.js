@@ -1,44 +1,70 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { loadCategoriesRequest } from '../actions'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { loadCategoriesRequest, loadPostsRequest } from "../actions";
 
-function DefaultView (props) {
-  const {categories} = props
-  return (
-    <div>
-        {console.log('categories', categories)}
+class DefaultView extends Component {
+  componentDidMount() {
+    console.log("-----------componentDidMount");
+    this.props.loadCategoriesRequest();
+    this.props.loadAllPosts();
+  }
 
-{
-  categories!=null && ('category' in categories) ?
-  <div>
-    {categories.forEach(category => {
-          <div> 
-            {category.name}
-          </div>
-      }
-    )} 
-    </div>
-  :
-  <div/>
+  render() {
+    const categories = this.props.categories.categories;
+    const posts = this.props.posts ? this.props.posts['all'] : null;
+    console.log('posts_________________________', posts);
+    console.log('this.props.categories', categories);
 
-}
-    </div>
-  )
-}
+    return (
+      <div>
+        {categories != null
+          ?
+          <div>
+              <b>Categories</b>
+               <ul>
+              {categories.map(category =>
 
-function mapStateToProps ({categories}) {
-  return {
-    categories
+
+                <li key={category.name}>
+                  {category.name}
+                </li>
+              )}
+            </ul>
+            </div>
+          : <div />}
+<br/>
+        {posts != null && posts instanceof Array
+          ?
+          <div>
+              <b>Posts</b>
+               <ul>
+              {posts.map(post =>
+                <li key={post.id}>
+                  <b>{post.title}</b><br/>
+                  {post.body}
+                  <br/><br/>
+                </li>
+              )}
+            </ul>
+            </div>
+          : <div />}
+      </div>
+    );
   }
 }
 
-function mapDispatchToProps (dispatch) {
+function mapStateToProps({ categories, posts }) {
   return {
-    loadCategoriesRequest: dispatch(loadCategoriesRequest())
-  }
+    categories,
+    posts
+  };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DefaultView)
+function mapDispatchToProps(dispatch) {
+  return {
+    loadCategoriesRequest: () => dispatch(loadCategoriesRequest()),
+    loadAllPosts: () => dispatch(loadPostsRequest('all'))    
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DefaultView);

@@ -14,28 +14,40 @@ export const DELETE_COMMENT = 'DELETE_COMMENT '
 
 const BASE_URL = "http://localhost:5001/"
 
+const HEADER =  {
+                    headers: { 
+                        'Authorization': 'whatever-you-want' 
+                    }
+                };
+
 //Network Requests
 export function loadCategoriesRequest(){
     return (dispatch, getState) => {
         if (getState().categories!=null){
-            let categories = [];    
-            console.log(BASE_URL+'categories');
             fetch(BASE_URL+'categories', 
-            { 
-                headers: { 
-                    'Authorization': 'whatever-you-want' 
-                }})        
-            .then(categories => dispatch(loadCategories(categories)));
+                
+                    HEADER
+                
+            )
+            .then((response) => response.json())        
+            .then(data => dispatch(loadCategories(data.categories)));
         }
     }
 }
 
-export function loadPostsRequest({category}){
+export function loadPostsRequest(category){
+        console.log('1---category', category);
+
+    let url =  'posts' + ('all'!==category ? '/' + category : '');
+    console.log('---url', url);
     return (dispatch, getState) => {
-        if (getState().posts[category]!=null){
-            let posts = [];
-            dispatch(loadPosts(posts));
-        }
+            fetch(BASE_URL+url, 
+                 
+                    HEADER
+            
+            )
+            .then((response) => response.json())        
+            .then(posts => dispatch(loadPosts(category, posts)));
     }
 }
 
@@ -84,17 +96,20 @@ export function deleteCommentRequest({id}){
     }
 }
 
-export function loadCategories({categories}){
+export function loadCategories(categories){
+    console.log('---categories, ', categories)
     return {
         type: LOAD_CATEGORIES,
         categories
     }
 }
 
-export function loadPosts({posts}){
+export function loadPosts(category, posts){
+    console.log('loadPosts action ', category, posts);
     return {
         type: LOAD_POSTS,
-        posts
+        category: category,
+        posts: posts
     }
 }
 

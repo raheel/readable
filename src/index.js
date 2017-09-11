@@ -9,8 +9,10 @@ import reducer from './reducers'
 import { Provider } from 'react-redux';
 import registerServiceWorker from './registerServiceWorker';
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
 const store = createStore(reducer,
-    compose(   
+    composeEnhancers(   
         applyMiddleware(thunk)
     )
 );
