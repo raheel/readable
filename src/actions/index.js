@@ -1,6 +1,7 @@
 export const LOAD_CATEGORIES = 'LOAD_CATEGORIES'
 
 export const LOAD_POSTS = 'LOAD_POSTS'
+export const LOAD_POST = 'LOAD_POST'
 export const SORT_POSTS_BY = 'SORT_POSTS_BY'
 export const EDIT_POST = 'EDIT_POST'
 export const DELETE_POST = 'DELETE_POST'
@@ -36,10 +37,13 @@ export function loadCategoriesRequest(){
 }
 
 export function loadPostsRequest(category){
-        console.log('1---category', category);
+    let url = 'posts'; 
+    
+    if ('all'!==category){
+        url = category + '/posts';
+    }
 
-    let url =  'posts' + ('all'!==category ? '/' + category : '');
-    console.log('---url', url);
+    console.log('loadPostsRequest---url', url);
     return (dispatch, getState) => {
             fetch(BASE_URL+url, 
                  
@@ -50,6 +54,39 @@ export function loadPostsRequest(category){
             .then(posts => dispatch(loadPosts(category, posts)));
     }
 }
+
+export function loadPostRequest(id){
+    let url = 'posts/'+ id; 
+    
+
+    console.log('loadPostsRequest---url', url);
+    return (dispatch, getState) => {
+            fetch(BASE_URL+url, 
+                 
+                    HEADER
+            
+            )
+            .then((response) => response.json())        
+            .then(post => dispatch(loadPost(post)));
+    }
+}
+
+export function loadCommentsRequest(id){
+    let url = 'posts/'+ id + '/comments'; 
+    
+
+    console.log('loadCommentstRequest---url', url);
+    return (dispatch, getState) => {
+            fetch(BASE_URL+url, 
+                 
+                    HEADER
+            
+            )
+            .then((response) => response.json())        
+            .then(comments => dispatch(loadComments({id, comments})));
+    }
+}
+
 
 export function addPostRequest({post}){
     return (dispatch, getState) => {
@@ -66,15 +103,6 @@ export function editPostRequest({post}){
 export function deletePostRequest({id}){
     return (dispatch, getState) => {
             dispatch(deletePost(id));
-    }
-}
-
-export function loadCommentsRequest({post}){
-    return (dispatch, getState) => {
-        if (getState().comments[post]!=null){
-            let comments = [];
-            dispatch(loadComments(comments));
-        }
     }
 }
 
@@ -113,6 +141,14 @@ export function loadPosts(category, posts){
     }
 }
 
+export function loadPost(post){
+    console.log('loadPost action ', post);
+    return {
+        type: LOAD_POST,
+        post: post
+    }
+}
+
 export function sortPosts({sortBy}){
     return {
         type: SORT_POSTS_BY,
@@ -141,9 +177,10 @@ export function addPost({post}){
     }
 }
 
-export function loadComments({comments}){
+export function loadComments({id, comments}){
     return {
         type: LOAD_COMMENTS,
+        id,
         comments
     }
 }

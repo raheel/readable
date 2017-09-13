@@ -1,18 +1,56 @@
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
-const Category = (props) => {
-    return(
-        <div>{props.title}</div>
-    )
-}
 
-const Post = (props) => {
-    return(
-        <div>{props.title}</div>
-    )
-}
+export const Category = props => {
+  const name = props.name;
+  if (name==null) return <div/>;
+  return (
+    <div>
+      <Link to={`/category/${name}`}>  {name} </Link>
+    </div>
+  );
+};
 
-const Comment = (props) => {
-    return(
-        <div>{props.title}</div>
-    )
-}
+export const Post = props => {
+  const post = props.post;
+  if (post==null) return <div/>;
+
+  return (
+    <div>
+      <Link to={`/post/${post.id}`}><b>{post.title}</b></Link>
+      <br />
+      {post.body}<br />
+    </div>
+  );
+};
+
+export const PostDetails = props => {
+  const post = props.post;
+  if (post==null) return <div/>;
+
+  return (
+    <div>
+      <b>{post.title}</b><br />
+      {post.body}<br />
+      Author: {post.author}<br />
+      Timestamp: {post.author}<br />
+      Vote Score: {post.voteScore}<br />
+    </div>
+  );
+};
+
+export const Comment = props => {
+  const comment = props.comment;
+  if (comment==null) return <div/>;    
+  return (
+    <div>
+      <b>{comment.title}</b><br />
+      {comment.body}<br />
+      Author: {comment.author}<br />
+      Timestamp: {comment.author}<br />
+      Vote Score: {comment.voteScore}<br />
+
+    </div>
+  );
+};

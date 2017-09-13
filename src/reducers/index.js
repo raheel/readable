@@ -1,6 +1,8 @@
 import {
     LOAD_CATEGORIES,
     LOAD_POSTS,
+    LOAD_POST,
+    LOAD_COMMENTS
 } from '../actions'
 import { combineReducers } from 'redux'
 
@@ -25,9 +27,27 @@ function posts (state = {}, action) {
         ...state,
         [action.category]: action.posts
       }
+    case LOAD_POST :
+      return {
+        ...state,
+        ['currentPost']: action.post
+      }      
     default :
       return state
   }
 }
 
-export default combineReducers({categories, posts});
+function comments (state = {}, action) {
+  console.log('_-----_ action', action);
+  switch (action.type) {
+    case LOAD_COMMENTS :
+      return {
+        ...state,
+        [action.id]: action.comments
+      }    
+    default :
+      return state
+  }
+}
+
+export default combineReducers({categories, posts, comments});

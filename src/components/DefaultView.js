@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { loadCategoriesRequest, loadPostsRequest } from "../actions";
+import { Link } from "react-router-dom";
+import {Category, Post} from "./ReadableComponents";
 
 class DefaultView extends Component {
   componentDidMount() {
-    console.log("-----------componentDidMount");
     this.props.loadCategoriesRequest();
     this.props.loadAllPosts();
   }
@@ -12,8 +13,6 @@ class DefaultView extends Component {
   render() {
     const categories = this.props.categories.categories;
     const posts = this.props.posts ? this.props.posts['all'] : null;
-    console.log('posts_________________________', posts);
-    console.log('this.props.categories', categories);
 
     return (
       <div>
@@ -26,7 +25,7 @@ class DefaultView extends Component {
 
 
                 <li key={category.name}>
-                  {category.name}
+                <Category name={category.name}/>
                 </li>
               )}
             </ul>
@@ -40,9 +39,8 @@ class DefaultView extends Component {
                <ul>
               {posts.map(post =>
                 <li key={post.id}>
-                  <b>{post.title}</b><br/>
-                  {post.body}
-                  <br/><br/>
+                  <Post post={post}/>
+                  <br/>
                 </li>
               )}
             </ul>

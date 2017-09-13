@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Route, Switch } from "react-router-dom";
 import DefaultView from './components/DefaultView';
 import CategoryView from './components/CategoryView';
+import PostDetailsView from './components/PostDetailsView';
 import './App.css';
 
 class App extends Component {
@@ -21,10 +22,18 @@ class App extends Component {
       <Route
           exact
           path="/category/:name"
-          render={() =>
-            <CategoryView             
-            />}
+          render={props=> (
+                  <CategoryView {...props}/>
+          )}
         />
+
+      <Route
+          exact
+          path="/post/:id"
+          render={props=> (
+                  <PostDetailsView {...props}/>
+          )}
+        />        
 </Switch>
 
       </div>

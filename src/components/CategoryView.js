@@ -1,22 +1,23 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { loadPostsRequest } from "../actions";
+import {PostDetails} from "./ReadableComponents";
 
 
-export default class CategoryView extends Component {
-  constructor(props){
-    console.log("-----------constructor ", props);
-    super(props)
-  }
+class CategoryView extends Component {
 
   componentDidMount() {
-    console.log("-----------componentDidMount 1 ", this.props);
-   // this.props.loadPosts(this.props.category);
+    console.log("-----------componentDidMount 1 ", );
+    const category = this.props.match.params.name;
+   this.props.loadPosts(category);
   }
 
   render(){
-        const posts = null; // this.props.posts ? this.props.posts[this.props.params.name] : null;
-    console.log("-----------componentDidMount 2 ", this.props);
+    const category = this.props.match.params.name;
+    const posts = this.props.posts ? this.props.posts[category] : null;
 
+
+    
   return (
     <div>
         {posts != null && posts instanceof Array
@@ -26,9 +27,7 @@ export default class CategoryView extends Component {
                <ul>
               {posts.map(post =>
                 <li key={post.id}>
-                  <b>{post.title}</b><br/>
-                  {post.body}
-                  <br/><br/>
+                  <PostDetails post={post}/>                  
                 </li>
               )}
             </ul>
@@ -52,4 +51,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-//export default connect(mapStateToProps, mapDispatchToProps)(CategoryView);
+export default connect(mapStateToProps, mapDispatchToProps)(CategoryView);
