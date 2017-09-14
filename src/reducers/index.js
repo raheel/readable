@@ -2,6 +2,8 @@ import {
     LOAD_CATEGORIES,
     LOAD_POSTS,
     LOAD_POST,
+    ADD_NEW_POST,
+    EDIT_POST,
     LOAD_COMMENTS
 } from '../actions'
 import { combineReducers } from 'redux'
@@ -31,7 +33,20 @@ function posts (state = {}, action) {
       return {
         ...state,
         ['currentPost']: action.post
-      }      
+      }  
+    case EDIT_POST :
+      //remove existing posts
+      //refresh data
+      return {
+        ['currentPost']: action.post
+      }    
+    case ADD_NEW_POST :
+      //remove existing posts
+      //refresh data
+      return {
+        ...state,
+        ['currentPost']: action.post
+      }               
     default :
       return state
   }

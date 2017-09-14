@@ -54,3 +54,52 @@ export const Comment = props => {
     </div>
   );
 };
+
+
+export const EditPost = props => {
+  const post = props.post;
+  console.log('- - - - - - post ', post);
+  if (post==null) return <div/>;
+
+  return (
+    <div>
+      <b>Post Title </b> 
+            <input
+        type='text'
+        placeholder={post.title}
+        ref={(postTitleInput) => this.postTitleInput = postTitleInput}
+    />
+      <br />
+      <b>Post Body </b> 
+            <input
+        type='text'
+        placeholder={post.body}
+        ref={(postBodyInput) => this.postBodyInput = postBodyInput}
+    />      
+    <br />
+
+    <button
+        onClick={editPostSubmit} value={props.editPost}>
+        Submit
+    </button>
+    </div>
+  );
+};
+
+  const editPostSubmit = (e) => {
+      console.log('title:', this.postTitleInput.value);
+      console.log('body:', this.postBodyInput.value);
+
+      const title = this.postTitleInput.value;
+      const body = this.postBodyInput.value;
+
+
+    if (!this.postTitleInput.value || !this.postBodyInput.value) {
+      return
+    }
+
+    e.preventDefault()
+
+    e.target.editPost({title, body});
+
+  }
