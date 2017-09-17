@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { loadCategoriesRequest, loadPostsRequest } from "../actions";
 import { Link } from "react-router-dom";
-import {Category, Post} from "./ReadableComponents";
+import { Category, Post } from "./ReadableComponents";
 
 class DefaultView extends Component {
   componentDidMount() {
@@ -12,38 +12,33 @@ class DefaultView extends Component {
 
   render() {
     const categories = this.props.categories.categories;
-    const posts = this.props.posts ? this.props.posts['all'] : null;
+    const posts = this.props.posts;
 
     return (
       <div>
         {categories != null
-          ?
-          <div>
+          ? <div>
               <b>Categories</b>
-               <ul>
-              {categories.map(category =>
-
-
-                <li key={category.name}>
-                <Category name={category.name}/>
-                </li>
-              )}
-            </ul>
+              <ul>
+                {categories.map(category =>
+                  <li key={category.name}>
+                    <Category name={category.name} />
+                  </li>
+                )}
+              </ul>
             </div>
           : <div />}
-<br/>
+        <br />
         {posts != null && posts instanceof Array
-          ?
-          <div>
+          ? <div>
               <b>Posts</b>
-               <ul>
-              {posts.map(post =>
-                <li key={post.id}>
-                  <Post post={post}/>
-                  <br/>
-                </li>
-              )}
-            </ul>
+              <ul>
+                {posts.map(post =>
+                  <li key={post.id}>
+                    <Post post={post} />
+                  </li>
+                )}
+              </ul>
             </div>
           : <div />}
       </div>
@@ -61,7 +56,7 @@ function mapStateToProps({ categories, posts }) {
 function mapDispatchToProps(dispatch) {
   return {
     loadCategoriesRequest: () => dispatch(loadCategoriesRequest()),
-    loadAllPosts: () => dispatch(loadPostsRequest('all'))    
+    loadAllPosts: () => dispatch(loadPostsRequest("all"))
   };
 }
 

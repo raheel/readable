@@ -41,7 +41,15 @@ class App extends Component {
       exact
       path="/create/:type"
       render={props=> (
-              <CreateOrEditView {...props}/>
+              <CreateOrEditView {...props} mode='create'/>
+      )}
+    />  
+
+     <Route
+      exact
+      path="/create/:type/:id"
+      render={props=> (
+              <CreateOrEditView {...props} mode='create'/>
       )}
     />  
 
@@ -49,7 +57,7 @@ class App extends Component {
       exact
       path="/edit/:type/:id"
       render={props=> (
-              <CreateOrEditView {...props}/>
+              <CreateOrEditView {...props} mode='edit'/>
       )}
     />    
   

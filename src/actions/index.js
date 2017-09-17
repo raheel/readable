@@ -6,6 +6,7 @@ export const SORT_POSTS_BY = "SORT_POSTS_BY";
 export const EDIT_POST = "EDIT_POST";
 export const DELETE_POST = "DELETE_POST";
 export const ADD_NEW_POST = "ADD_NEW_POST";
+export const VOTE_POST = "VOTE_POST";
 
 export const LOAD_COMMENTS = "LOAD_COMMENTS";
 export const SORT_COMMENTS_BY = "SORT_COMMENTS_BY";
@@ -64,7 +65,6 @@ export function loadPostsRequest(category) {
     url = category + "/posts";
   }
 
-  console.log("loadPostsRequest---url", url);
   return (dispatch, getState) => {
     fetch(BASE_URL + url, GET_HEADER)
       .then(response => response.json())
@@ -75,7 +75,6 @@ export function loadPostsRequest(category) {
 export function loadPostRequest(id) {
   let url = "posts/" + id;
 
-  console.log("loadPostsRequest---url", url);
   return (dispatch, getState) => {
     fetch(BASE_URL + url, GET_HEADER)
       .then(response => response.json())
@@ -86,7 +85,6 @@ export function loadPostRequest(id) {
 export function loadCommentsRequest(id) {
   let url = "posts/" + id + "/comments";
 
-  console.log("loadCommentstRequest---url", url);
   return (dispatch, getState) => {
     fetch(BASE_URL + url, GET_HEADER)
       .then(response => response.json())
@@ -94,33 +92,47 @@ export function loadCommentsRequest(id) {
   };
 }
 
-export function addPostRequest({ post }) {
-  let url = "posts/" + post.id + "/comments";
-  let id = post.id;
-  console.log("loadCommentstRequest---url", url);
+export function addPostRequest(post) {
+    console.log('addPostRequest', post);
+  let {id, title, body, owner, category, timestamp} = post;
+  let url = 'posts';
+  let postBody = {body: JSON.stringify({ id, title, body, owner, category, timestamp })};
+  console.log('postBody: ', postBody);
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, POST_HEADER)
-      .then(response => response.json())
-      .then(comments => dispatch(addPost({ id, comments })));
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
+      .then(dispatch(addPost(post)));
   };
 }
 
-export function editPostRequest({ post }) {
+export function editPostRequest(post) {
   let url = "posts/" + post.id ;
+  let postBody = {body: post};
 
-  console.log("editPostRequest---url", url);
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, PUT_HEADER, {body: JSON.stringify(post)})
-      .then(response => response.json())
-      .then(comments => dispatch(editPost({ post})));
+    fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER))
+      .then(dispatch(editPost(post.id)));
   };
 }
 
-export function deletePostRequest({ id }) {
+export function deletePostRequest(id) {
+  let url = "posts/" + id ;
+
   return (dispatch, getState) => {
-    dispatch(deletePost(id));
+    fetch(BASE_URL + url, DELETE_HEADER)
+      .then(dispatch(deletePost(id)));
   };
 }
+
+export function votePostRequest(id, option) {
+  let url = "posts/" + id ;
+  let postBody = {body: JSON.stringify({option})};
+
+  return (dispatch, getState) => {
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
+      .then(dispatch(votePost({id, option})));
+  };
+}
+
 
 export function addCommentRequest({ comment }) {
   return (dispatch, getState) => {
@@ -139,7 +151,6 @@ export function deleteCommentRequest({ id }) {
 }
 
 export function loadCategories(categories) {
-  console.log("---categories, ", categories);
   return {
     type: LOAD_CATEGORIES,
     categories
@@ -147,7 +158,6 @@ export function loadCategories(categories) {
 }
 
 export function loadPosts(category, posts) {
-  console.log("loadPosts action ", category, posts);
   return {
     type: LOAD_POSTS,
     category: category,
@@ -156,7 +166,6 @@ export function loadPosts(category, posts) {
 }
 
 export function loadPost(post) {
-  console.log("loadPost action ", post);
   return {
     type: LOAD_POST,
     post: post
@@ -177,19 +186,29 @@ export function editPost({ post }) {
   };
 }
 
-export function deletePost({ id }) {
+export function deletePost(id) {
   return {
     type: DELETE_POST,
     id
   };
 }
 
-export function addPost({ post }) {
+export function addPost(post) {
   return {
     type: ADD_NEW_POST,
-    id: post.id
+    post
   };
 }
+
+export function votePost({id, option}) {
+    console.log('___________________________-votePost', id, option)
+  return {
+    type: VOTE_POST,
+    id,
+    option
+  };
+}
+
 
 export function loadComments({ id, comments }) {
   return {

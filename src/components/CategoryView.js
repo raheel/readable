@@ -1,42 +1,53 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { loadPostsRequest } from "../actions";
-import {PostDetails} from "./ReadableComponents";
-
+import {
+  loadPostsRequest,
+  deletePostRequest,
+  votePostRequest
+} from "../actions";
+import { Post } from "./ReadableComponents";
+import { Link } from "react-router-dom";
 
 class CategoryView extends Component {
-
   componentDidMount() {
-    console.log("-----------componentDidMount 1 ", );
     const category = this.props.match.params.name;
-   this.props.loadPosts(category);
+    this.props.loadPosts(category);
   }
 
-  render(){
+  render() {
     const category = this.props.match.params.name;
-    const posts = this.props.posts ? this.props.posts[category] : null;
+    let posts = this.props.posts;
 
+    if (!Array.isArray(posts) || posts.length == 0) {
+      return (
+        <div>
+          <b>No Posts</b><br />
+          <Link to={`/create/post`}>Create Post</Link>
+        </div>
+      );
+    }
 
-    
-  return (
-    <div>
+    posts = posts.filter(post => post.category === category);
+
+    return (
+      <div>
         {posts != null && posts instanceof Array
-          ?
-          <div>
-              <b>Posts</b>
-               <ul>
-              {posts.map(post =>
-                <li key={post.id}>
-                  <PostDetails post={post}/>                  
-                </li>
-              )}
-            </ul>
+          ? <div>
+              <b>Posts</b><br />
+              <Link to={`/create/post`}>Create Post</Link>
+
+              <ul>
+                {posts.map(post =>
+                  <li key={post.id}>
+                    <Post post={post} vote={this.props.votePost} delete={this.props.deletePost} />
+                  </li>
+                )}
+              </ul>
             </div>
           : <div />}
-    </div>
-  )
-}
-
+      </div>
+    );
+  }
 }
 
 function mapStateToProps({ posts }) {
@@ -47,7 +58,9 @@ function mapStateToProps({ posts }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    loadPosts: (category) => dispatch(loadPostsRequest(category))    
+    loadPosts: category => dispatch(loadPostsRequest(category)),
+    votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
+    deletePost: id => dispatch(deletePostRequest(id))
   };
 }
 
