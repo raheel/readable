@@ -6,7 +6,12 @@ import {
   EDIT_POST,
   DELETE_POST,
   VOTE_POST,
-  LOAD_COMMENTS
+  SORT_POSTS,
+  LOAD_COMMENTS,
+  ADD_NEW_COMMENT,
+  EDIT_COMMENT,
+  DELETE_COMMENT,
+  VOTE_COMMENT
 } from "../actions";
 import { combineReducers } from "redux";
 
@@ -37,44 +42,63 @@ function posts(state = {}, action) {
           found = true;
         }
       }
-
       if (!found) {
         state.push(action.post);
       }
       return state;
     case EDIT_POST:
-      //remove existing posts
-      //refresh data
-      return {
-        ["currentPost"]: action.post
-      };
+      let newState = state;
+           console.log("************EDIT_POST 1", newState, 'isarray', Array.isArray(newState));
+
+      if (Array.isArray(newState)) {
+        newState = newState.map(post => {
+          console.log("************EDIT_POST post ids, ", post.id, action.post.id);
+          if (post.id == action.post.id) {
+              post = Object.assign({},action.post,post);
+          }
+          return post;
+        });
+      } else {
+        newState = [action.post];
+      }
+      console.log('newState', newState);
+      return newState;
     case ADD_NEW_POST:
       if (Array.isArray(state)) {
         state.push(action.post);
-        return state;
       }
-      return action.post;
+      return state;
     case DELETE_POST:
       if (Array.isArray(state)) {
-        state = state.map(post => 
-        {
-          if (post.id==action.id){
-            post.deleted='true';
+        state = state.map(post => {
+          if (post.id == action.id) {
+            post.deleted = "true";
           }
-          return post; 
-        }
-        );
+          return post;
+        });
       }
       return state;
     case VOTE_POST:
       if (Array.isArray(state)) {
-        state = state.map(post => 
-        {
-          console.log('VOTE_POST post, ', post);
-          if (post.id==action.id){
-            action.option=="upVote" ? post.voteScore = post.voteScore+1 : post.voteScore = post.voteScore-1;
+        state = state.map(post => {
+          console.log("VOTE_POST post, ", post);
+          if (post.id == action.id) {
+            action.option == "upVote"
+              ? (post.voteScore = post.voteScore + 1)
+              : (post.voteScore = post.voteScore - 1);
           }
-          return post; 
+          return post;
+        });
+      }
+      return state;
+    case SORT_POSTS:
+      if (Array.isArray(state)) {
+        state.sort((post1, post2) => {
+          if (action.sortBy === "voteScore") {
+            return post1.voteScore - post2.score;
+          } else if (action.sortBy === "timestamp") {
+            return post1.timestamp.localeCompare(post2.timestamp);
+          }
         });
       }
       return state;
@@ -86,10 +110,65 @@ function posts(state = {}, action) {
 function comments(state = {}, action) {
   switch (action.type) {
     case LOAD_COMMENTS:
+      let comments = action.comments;
+      if (comments == null || !Array.isArray(comments)) {
+        return state;
+      }
+      
+      comments.sort((comment1, comment2) => (
+        comment2.voteScore - comment1.voteScore
+      ));
+
+      console.log('comments', comments);
       return {
         ...state,
-        [action.id]: action.comments
+        [action.id]: comments
       };
+    case EDIT_COMMENT:
+      if (Array.isArray(state)) {
+        state.push(action.comment);
+      } else {
+        return [action.comment];
+      }
+      return state;
+    case ADD_NEW_COMMENT:
+      if (Array.isArray(state)) {
+        state.push(action.comment);
+      }
+      return state;
+    case DELETE_COMMENT:
+      if (Array.isArray(state)) {
+        state = state.map(comment => {
+          if (comment.id == action.id) {
+            comment.deleted = "true";
+          }
+          return comment;
+        });
+      }
+      return state;
+    case VOTE_COMMENT:
+      let newState = Object.assign({}, state);
+      if (state != null) {
+        newState[action.postId] = newState[action.postId].map(comment => {
+          if (comment.id == action.commentId) {
+            action.option == "upVote"
+              ? (comment.voteScore = comment.voteScore + 1)
+              : (comment.voteScore = comment.voteScore - 1);
+          }
+          return comment;
+        });
+      }
+
+      newState[action.postId].sort(
+        (comment1, comment2) => (
+          comment2.voteScore - comment2.voteScore
+        )
+      );
+
+      console.log('comments', newState[action.postId]);
+
+      return newState;
+
     default:
       return state;
   }

@@ -12,20 +12,54 @@ export const Category = props => {
 };
 
 export const Post = props => {
-  const post = props.post;
+  const {post, hist} = props;
   if (post == null || post.deleted!=false) return <div />;
 
   return (
     <div className='post'>
       <Link to={`/post/${post.id}`}><b>{post.title}</b></Link><br/>
+
       <br />
       {post.body}<br />
+      Timestamp: {new Date(post.timestamp).toUTCString()}<br />
+      Vote Score: {post.voteScore}<br />
+
+          <Route
+              render={({ history }) =>
+          <button
+            type="button"
+             onClick={() => {
+              history.push('/create/post/' + post.category);
+            }}
+          >
+            New
+          </button>}
+      />
+
+      <Route
+        render={({ history }) =>
+          <button
+            type="button"
+             onClick={() => {
+              history.push('/edit/post/' + post.id);
+            }}
+          >
+                Edit
+            </button>}
+        />
+
+        <button onClick={() => props.deletePost(hist, post.id)}>Delete</button>
+
+  <br/>
+
+      <button onClick={() => props.votePost(post.id, "upVote")}>Upvote</button>
+      <button onClick={() => props.votePost(post.id, "downVote")}>Downvote</button>
     </div>
   );
 };
 
 export const PostDetails = props => {
-  const post = props.post;
+  const {post, hist} = props;
   const comments = props.comments;
   console.log('----------postdetails, ', props);
   if (post == null || post.deleted!=false) return <div />;
@@ -60,16 +94,16 @@ export const PostDetails = props => {
               history.push('/edit/post/' + post.id);
             }}
           >
-            Edit
-          </button>}
-      />
+              Edit
+            </button>}
+        />
 
-      <button onClick={() => props.delete(post.id)}>Delete</button>
+        <button onClick={() => props.deletePost(hist, post.id)}>Delete</button>
 
-<br/>
+  <br/>
 
-      <button onClick={() => props.vote(post.id, "upVote")}>Upvote</button>
-      <button onClick={() => props.vote(post.id, "downVote")}>Downvote</button>
+      <button onClick={() => props.votePost(post.id, "upVote")}>Upvote</button>
+      <button onClick={() => props.votePost(post.id, "downVote")}>Downvote</button>
       
 
           {comments != null && comments instanceof Array
@@ -79,7 +113,7 @@ export const PostDetails = props => {
                 <ul>
                   {comments.map(comment =>
                     <li  className='comment' key={comment.id}>
-                      <Comment comment={comment} />
+                      <Comment comment={comment} voteComment={props.voteComment} />
                     </li>
                   )}
                 </ul>
@@ -100,8 +134,8 @@ export const Comment = props => {
       Timestamp: {comment.author}<br />
       Vote Score: {comment.voteScore}<br />
 
-          <button onClick={() => props.vote(comment.id, "upVote")}>Upvote</button>
-      <button onClick={() => props.vote(comment.id, "downVote")}>Downvote</button>
+      <button onClick={() => props.voteComment(comment.parentId, comment.id, "upVote")}>Upvote</button>
+      <button onClick={() => props.voteComment(comment.parentId, comment.id, "downVote")}>Downvote</button>
 
       <Route
         render={({ history }) =>
@@ -125,7 +159,7 @@ export const CreatePost = props => {
   const category = props.category;
 
   console.log("category", category);
-  console.log("addPost", props.addPost);
+  console.log("------------>addPost", props.addPost);
   if (category == null) return <div />;
 
   return (
@@ -145,7 +179,7 @@ export const CreatePost = props => {
       <b>Post Category </b>
       <input
         type="text"
-        placeholder={category}
+        defaultValue={category}
         ref={postCategoryInput => (this.postCategoryInput = postCategoryInput)}
       />
 
@@ -153,7 +187,7 @@ export const CreatePost = props => {
 
       <button
         onClick={() => {
-          addPostSubmit(props.addPost);
+          addPostSubmit(props.hist, props.addPost);
         }}
       >
 
@@ -164,7 +198,8 @@ export const CreatePost = props => {
 };
 
 export const EditPost = props => {
-  const post = props.post;
+  const {post, hist} = props;
+
   console.log('editpost ', post);
   if (post == null) return <div />;
 
@@ -187,7 +222,7 @@ export const EditPost = props => {
 
       <button
         onClick={() => {
-          editPostSubmit(post.id, props.editPost);
+          editPostSubmit(hist, post.id, props.editPost);
         }}
       >
         Submit
@@ -196,11 +231,12 @@ export const EditPost = props => {
   );
 };
 
-const addPostSubmit = addPost => {
+const addPostSubmit = (hist, addPost) => {
   console.log("title:", this.postTitleInput.value);
   console.log("body:", this.postBodyInput.value);
   console.log("category:", this.postCategoryInput.value);
   console.log("addPost:", addPost);
+  console.log("hist:", hist);
 
   const title = this.postTitleInput.value;
   const body = this.postBodyInput.value;
@@ -219,14 +255,15 @@ const addPostSubmit = addPost => {
 
   window.event.preventDefault();
 
-  addPost({ id, title, body, category, owner, timestamp });
+  addPost(hist, { id, title, body, category, owner, timestamp });
 
   console.log("addPost done");
 };
 
-const editPostSubmit = (id, editPost) => {
+const editPostSubmit = (hist, id, editPost) => {
   console.log("title:", this.postTitleInput.value);
   console.log("body:", this.postBodyInput.value);
+  console.log("history:", hist);
   const title = this.postTitleInput.value;
   const body = this.postBodyInput.value;
 
@@ -236,5 +273,5 @@ const editPostSubmit = (id, editPost) => {
 
   window.event.preventDefault();
 
-  editPost({ id, title, body });
+  editPost(hist, { id, title, body });
 };

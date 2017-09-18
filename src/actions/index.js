@@ -2,17 +2,17 @@ export const LOAD_CATEGORIES = "LOAD_CATEGORIES";
 
 export const LOAD_POSTS = "LOAD_POSTS";
 export const LOAD_POST = "LOAD_POST";
-export const SORT_POSTS_BY = "SORT_POSTS_BY";
 export const EDIT_POST = "EDIT_POST";
 export const DELETE_POST = "DELETE_POST";
 export const ADD_NEW_POST = "ADD_NEW_POST";
 export const VOTE_POST = "VOTE_POST";
+export const SORT_POSTS = "SORT_POSTS";
 
 export const LOAD_COMMENTS = "LOAD_COMMENTS";
-export const SORT_COMMENTS_BY = "SORT_COMMENTS_BY";
 export const ADD_NEW_COMMENT = "ADD_NEW_COMMENT";
 export const EDIT_COMMENT = "EDIT_COMMENT";
 export const DELETE_COMMENT = "DELETE_COMMENT ";
+export const VOTE_COMMENT = "VOTE_COMMENT";
 
 const BASE_URL = "http://localhost:5001/";
 
@@ -92,34 +92,44 @@ export function loadCommentsRequest(id) {
   };
 }
 
-export function addPostRequest(post) {
-    console.log('addPostRequest', post);
+export function addPostRequest(history, post) {
+    console.log('addPostRequest', history, post);
   let {id, title, body, owner, category, timestamp} = post;
   let url = 'posts';
   let postBody = {body: JSON.stringify({ id, title, body, owner, category, timestamp })};
   console.log('postBody: ', postBody);
   return (dispatch, getState) => {
     fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
-      .then(dispatch(addPost(post)));
+      .then(() => {
+        dispatch(addPost(post));
+        history.push('/category/'+category  );
+      });
   };
 }
 
-export function editPostRequest(post) {
+export function editPostRequest(history, post) {
+  console.log('test_____________editPostRequest: post', post);
   let url = "posts/" + post.id ;
-  let postBody = {body: post};
+  let postBody = {body: JSON.stringify(post)};
 
   return (dispatch, getState) => {
     fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER))
-      .then(dispatch(editPost(post.id)));
+      .then(() => {
+        dispatch(editPost(post));
+        history.goBack();
+      });
   };
 }
 
-export function deletePostRequest(id) {
+export function deletePostRequest(history, id) {
   let url = "posts/" + id ;
 
   return (dispatch, getState) => {
     fetch(BASE_URL + url, DELETE_HEADER)
-      .then(dispatch(deletePost(id)));
+      .then(() => {
+        dispatch(deletePost(id));
+        alert('Succesfully deleted post with id' + id);
+      });    
   };
 }
 
@@ -150,6 +160,18 @@ export function deleteCommentRequest({ id }) {
   return (dispatch, getState) => {};
 }
 
+export function voteCommentRequest(postId, commentId, option) {
+  console.log('voteCommentRequest postId, commentId, option', postId, commentId, option);
+  let url = "comments/" +commentId ;
+  let postBody = {body: JSON.stringify({option})};
+
+  return (dispatch, getState) => {
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
+      .then(
+        dispatch(voteComment({postId, commentId, option})));
+  };
+}
+
 export function loadCategories(categories) {
   return {
     type: LOAD_CATEGORIES,
@@ -174,12 +196,14 @@ export function loadPost(post) {
 
 export function sortPosts({ sortBy }) {
   return {
-    type: SORT_POSTS_BY,
+    type: SORT_POSTS,
     sortBy
   };
 }
 
-export function editPost({ post }) {
+export function editPost(post) {
+    console.log('editPost: post', post);
+
   return {
     type: EDIT_POST,
     post
@@ -201,7 +225,6 @@ export function addPost(post) {
 }
 
 export function votePost({id, option}) {
-    console.log('___________________________-votePost', id, option)
   return {
     type: VOTE_POST,
     id,
@@ -211,17 +234,11 @@ export function votePost({id, option}) {
 
 
 export function loadComments({ id, comments }) {
+  console.log('----comments, ', comments);
   return {
     type: LOAD_COMMENTS,
     id,
     comments
-  };
-}
-
-export function sortComments({ sortBy }) {
-  return {
-    type: SORT_COMMENTS_BY,
-    sortBy
   };
 }
 
@@ -245,3 +262,13 @@ export function addComment({ comment }) {
     id: comment.id
   };
 }
+
+export function voteComment({postId, commentId, option}) {
+  return {
+    type: VOTE_COMMENT,
+    postId,
+    commentId,
+    option
+  };
+}
+

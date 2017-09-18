@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { loadPostRequest, loadCommentsRequest, deletePostRequest, votePostRequest } from "../actions";
+import { loadPostRequest, editPostRequest, deletePostRequest, votePostRequest,
+loadCommentsRequest, editCommentRequest, deleteCommentRequest, voteCommentRequest} from "../actions";
 import { PostDetails, Comment } from "./ReadableComponents";
+import { withRouter } from "react-router-dom";
 
 class PostDetailsView extends Component {
   componentDidMount() {
@@ -16,6 +18,7 @@ class PostDetailsView extends Component {
     let posts = this.props.posts;
     let post = null;
 
+    console.log('=====render ', this.props)
     if (posts==null || !Array.isArray(posts)){
       return null;
     }
@@ -26,13 +29,16 @@ class PostDetailsView extends Component {
       }
     }
 
+
     const comments = this.props.comments ? this.props.comments[id] : null;
 
     if (post != null) {
       return (
         <div>
           <h1 style={{display: 'flex', justifyContent: 'center'}}>Post Details</h1>
-          <PostDetails post={post} comments={comments} vote={this.props.votePost} delete={this.props.deletePost}/>
+          <PostDetails post={post} comments={comments} hist={this.props.history}
+          votePost={this.props.votePost} editPost={this.props.editPost} deletePost={this.props.deletePost}
+          voteComment={this.props.voteComment} deleteComment={this.props.deleteComment}/>
         </div>
       );
     } else {
@@ -49,16 +55,18 @@ function mapStateToProps({ posts, comments }) {
   };
 }
 
+
 function mapDispatchToProps(dispatch) {
   return {
     loadPost: id => dispatch(loadPostRequest(id)),
-    votePost: (id, mode) => {
-      let res = dispatch(votePostRequest(id, mode));
-      console.log('-------res ', res);
-    },
-    deletePost: (id) => dispatch(deletePostRequest(id)),
-    loadComments: id => dispatch(loadCommentsRequest(id)),    
+    editPost: (hist, post) => dispatch(editPostRequest(hist, post)),    
+    deletePost: (hist,  id) => dispatch(deletePostRequest(hist, id)),    
+    votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
+    loadComments: id => dispatch(loadCommentsRequest(id)),
+    editComment: (id) => dispatch(editCommentRequest(id)),    
+    deleteComment: (id) => dispatch(deleteCommentRequest(id)),    
+    voteComment: (postId, categoryId, mode) => dispatch(voteCommentRequest(postId, categoryId, mode)),        
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PostDetailsView);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PostDetailsView));

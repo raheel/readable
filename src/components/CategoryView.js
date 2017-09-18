@@ -1,17 +1,32 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
-  loadPostsRequest,
+loadPostsRequest, editPostRequest,
   deletePostRequest,
   votePostRequest
 } from "../actions";
 import { Post } from "./ReadableComponents";
-import { Link } from "react-router-dom";
+import { Link, Route, withRouter } from "react-router-dom";
 
+let newPostButton = null;
+      
 class CategoryView extends Component {
   componentDidMount() {
     const category = this.props.match.params.name;
     this.props.loadPosts(category);
+
+    newPostButton = 
+      <Route
+        render={({ history }) =>
+          <button
+            type="button"
+             onClick={() => {
+              history.push('/create/post/' + category);
+            }}
+          >
+            New
+          </button>}
+      />;
   }
 
   render() {
@@ -22,7 +37,8 @@ class CategoryView extends Component {
       return (
         <div>
           <b>No Posts</b><br />
-          <Link to={`/create/post`}>Create Post</Link>
+
+{newPostButton}
         </div>
       );
     }
@@ -34,12 +50,12 @@ class CategoryView extends Component {
         {posts != null && posts instanceof Array
           ? <div>
               <b>Posts</b><br />
-              <Link to={`/create/post`}>Create Post</Link>
+{newPostButton}
 
               <ul>
                 {posts.map(post =>
                   <li key={post.id}>
-                    <Post post={post} vote={this.props.votePost} delete={this.props.deletePost} />
+                    <Post post={post} votePost={this.props.votePost} deletePost={this.props.deletePost} />
                   </li>
                 )}
               </ul>
@@ -58,10 +74,11 @@ function mapStateToProps({ posts }) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    loadPosts: category => dispatch(loadPostsRequest(category)),
-    votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
-    deletePost: id => dispatch(deletePostRequest(id))
+    loadPosts: id => dispatch(loadPostsRequest(id)),
+    editPost: (hist, post) => dispatch(editPostRequest(hist, post)),    
+    deletePost: (displayFunction, id) => dispatch(deletePostRequest(displayFunction, id)),    
+    votePost: (id, mode) => dispatch(votePostRequest(id, mode))
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryView);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CategoryView));
