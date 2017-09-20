@@ -60,11 +60,11 @@ function mapDispatchToProps(dispatch) {
   return {
     loadPost: id => dispatch(loadPostRequest(id)),
     editPost: (hist, post) => dispatch(editPostRequest(hist, post)),    
-    deletePost: (hist,  id) => dispatch(deletePostRequest(hist, id)),    
+    deletePost: (id) => dispatch(deletePostRequest(id)),    
     votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
     loadComments: id => dispatch(loadCommentsRequest(id)),
-    editComment: (id) => dispatch(editCommentRequest(id)),    
-    deleteComment: (id) => dispatch(deleteCommentRequest(id)),    
+    editComment: comment => dispatch(editCommentRequest(comment)),    
+    deleteComment: (comment) => dispatch(deleteCommentRequest(comment)),    
     voteComment: (postId, categoryId, mode) => dispatch(voteCommentRequest(postId, categoryId, mode)),        
   };
 }

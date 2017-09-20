@@ -158,7 +158,7 @@ export const Comment = props => {
           </button>}
       />
 
-      <button onClick={() => props.delete(comment.id)}>Delete</button>
+      <button onClick={() => props.delete(comment)}>Delete</button>
       <br/>
 
 
@@ -302,7 +302,7 @@ export const EditComment = props => {
 
       <button
         onClick={() => {
-          editCommentSubmit(props.hist, props.comment.id, props.editComment);
+          editCommentSubmit(props.hist, props.comment, props.editComment);
         }}
       >
 
@@ -388,7 +388,7 @@ const addCommentSubmit = (hist, postId, addComment) => {
 
 
 
-const editCommentSubmit = (hist, id, editComment) => {
+const editCommentSubmit = (hist, comment, editComment) => {
   //console.log("commentBodyInput:", this.commentBodyInput.value);
   //console.log("commentAuthorInput:", this.commentAuthorInput.value);
 
@@ -404,9 +404,10 @@ const editCommentSubmit = (hist, id, editComment) => {
   }
 
   window.event.preventDefault();
-
-console.log('---->new comment', { id, body, timestamp });
-  editComment(hist, { id, body, timestamp });
+let parentId = comment.parentId;
+let id = comment.id; 
+console.log('---->new comment', { id, parentId, body, timestamp });
+  editComment(hist, { id, parentId, body, timestamp });
 
   //console.log("addComment done");
 };

@@ -133,7 +133,7 @@ export function editPostRequest(history, post) {
   };
 }
 
-export function deletePostRequest(history, id) {
+export function deletePostRequest(id) {
   let url = "posts/" + id ;
 
   return (dispatch, getState) => {
@@ -190,9 +190,16 @@ export function editCommentRequest(history, comment) {
   };
 }
 
-export function deleteCommentRequest({ id }) {
-  return (dispatch, getState) => {};
-}
+export function deleteCommentRequest(comment) {
+  let url = "posts/" + comment.id ;
+
+  return (dispatch, getState) => {
+    fetch(BASE_URL + url, DELETE_HEADER)
+      .then(() => {
+        dispatch(deleteComment(comment));
+        alert('Succesfully deleted comment with id' + comment.id);
+      });    
+  };}
 
 export function voteCommentRequest(postId, commentId, option) {
   console.log('voteCommentRequest postId, commentId, option', postId, commentId, option);
@@ -284,17 +291,17 @@ export function loadComment(comment) {
   };
 }
 
-export function editComment({ comment }) {
+export function editComment(comment) {
   return {
     type: EDIT_COMMENT,
     comment
   };
 }
 
-export function deleteComment({ id }) {
+export function deleteComment(comment) {
   return {
     type: DELETE_COMMENT,
-    id
+    comment
   };
 }
 

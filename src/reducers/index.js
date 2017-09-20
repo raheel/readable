@@ -151,29 +151,45 @@ function comments(state = {}, action) {
         st[postId].push(action.comment);
       }      
       return st;
-    case EDIT_COMMENT:
-      if (Array.isArray(state)) {
-        state.push(action.comment);
+    case EDIT_COMMENT:{
+      console.log('----action.comment ', action.comment);
+      let newState = Object.assign({}, state);
+      if (action.comment.parentId in newState) {
+        newState[action.comment.parentId] = newState[action.comment.parentId].map(comment =>{
+          if (comment.id==action.comment.id){
+            comment = Object.assign(comment, action.comment);
+          }
+          return comment;
+        });
       } else {
-        return [action.comment];
+        newState[action.comment.parentId] = [action.comment];
       }
-      return state;
-    case ADD_NEW_COMMENT:
-      if (Array.isArray(state)) {
-        state.push(action.comment);
+   
+      return newState;
+       }
+    case ADD_NEW_COMMENT:{
+      let newState = Object.assign({}, state);
+      if (action.comment.parentId in newState) {
+        newState[action.comment.parentId].push(action.comment);
+      } else {
+        newState[action.comment.parentId] = [action.comment];
       }
-      return state;
-    case DELETE_COMMENT:
-      if (Array.isArray(state)) {
-        state = state.map(comment => {
-          if (comment.id == action.id) {
+   
+      return newState; 
+    }
+    case DELETE_COMMENT:{
+      let newState = Object.assign({}, state);
+      if (action.comment.parentId in newState) {
+        newState = newState[action.comment.parentId].map(comment => {
+          if (comment.id == action.comment.id) {
             comment.deleted = "true";
           }
           return comment;
         });
       }
-      return state;
-    case VOTE_COMMENT:
+      return newState;
+    }
+    case VOTE_COMMENT: {
       let newState = Object.assign({}, state);
       if (state != null) {
         newState[action.postId] = newState[action.postId].map(comment => {
@@ -195,7 +211,7 @@ function comments(state = {}, action) {
       console.log('comments', newState[action.postId]);
 
       return newState;
-
+  }
     default:
       return state;
   }
