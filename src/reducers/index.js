@@ -8,6 +8,7 @@ import {
   VOTE_POST,
   SORT_POSTS,
   LOAD_COMMENTS,
+  LOAD_COMMENT,
   ADD_NEW_COMMENT,
   EDIT_COMMENT,
   DELETE_COMMENT,
@@ -111,10 +112,7 @@ function comments(state = {}, action) {
   switch (action.type) {
     case LOAD_COMMENTS:
       let comments = action.comments;
-      if (comments == null || !Array.isArray(comments)) {
-        return state;
-      }
-      
+
       comments.sort((comment1, comment2) => (
         comment2.voteScore - comment1.voteScore
       ));
@@ -124,6 +122,35 @@ function comments(state = {}, action) {
         ...state,
         [action.id]: comments
       };
+    case LOAD_COMMENT:
+     console.log('^^^^^^^^^^LOAD_COMMENT');
+      let postId = action.comment.parentId;
+      let st = Object.assign({}, state);
+      let found = false;
+      if (!(postId in st)) {
+        st[postId] = [action.comment];
+                        console.log('^^^^^^^^^^st[postId] ', st, postId);
+
+        return st;
+      }
+
+                console.log('^^^^^^^^^^st[postId] ', st, postId);
+
+
+      st[postId] = st[postId].map(comment =>{
+          comment = Object.assign({}, comment, action.comment);
+          found = true;
+          console.log('^^^^^^^^^^reducer comment', comment);
+          return comment;
+      })
+
+          console.log('^^^^^^^^^^reducer st', st);
+
+
+      if (!found) {
+        st[postId].push(action.comment);
+      }      
+      return st;
     case EDIT_COMMENT:
       if (Array.isArray(state)) {
         state.push(action.comment);

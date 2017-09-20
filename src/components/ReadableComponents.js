@@ -61,7 +61,7 @@ export const Post = props => {
 export const PostDetails = props => {
   const {post, hist} = props;
   const comments = props.comments;
-  console.log('----------postdetails, ', props);
+  //console.log('----------postdetails, ', props);
   if (post == null || post.deleted!=false) return <div />;
 
   return (
@@ -134,8 +134,17 @@ export const Comment = props => {
       Timestamp: {comment.author}<br />
       Vote Score: {comment.voteScore}<br />
 
-      <button onClick={() => props.voteComment(comment.parentId, comment.id, "upVote")}>Upvote</button>
-      <button onClick={() => props.voteComment(comment.parentId, comment.id, "downVote")}>Downvote</button>
+      <Route
+        render={({ history }) =>
+          <button
+            type="button"
+             onClick={() => {
+              history.push('/create/comment/' + comment.parentId);
+            }}
+          >
+            New
+          </button>}
+      />
 
       <Route
         render={({ history }) =>
@@ -150,6 +159,13 @@ export const Comment = props => {
       />
 
       <button onClick={() => props.delete(comment.id)}>Delete</button>
+      <br/>
+
+
+      <button onClick={() => props.voteComment(comment.parentId, comment.id, "upVote")}>Upvote</button>
+      <button onClick={() => props.voteComment(comment.parentId, comment.id, "downVote")}>Downvote</button>
+
+
           </div>
 
   );
@@ -158,8 +174,8 @@ export const Comment = props => {
 export const CreatePost = props => {
   const category = props.category;
 
-  console.log("category", category);
-  console.log("------------>addPost", props.addPost);
+  //console.log("category", category);
+  //console.log("------------>addPost", props.addPost);
   if (category == null) return <div />;
 
   return (
@@ -200,7 +216,7 @@ export const CreatePost = props => {
 export const EditPost = props => {
   const {post, hist} = props;
 
-  console.log('editpost ', post);
+  //console.log('editpost ', post);
   if (post == null) return <div />;
 
   return (
@@ -231,12 +247,79 @@ export const EditPost = props => {
   );
 };
 
+export const CreateComment = props => {
+  const postId = props.postId;
+
+  //console.log("postId", postId);
+  //console.log("------------>addComment", props.addComment);
+  if (props.postId == null) return <div />;
+
+  return (
+    <div className='post'>
+      <b>Comment</b>
+      <input
+        type="text"
+        ref={commentBodyInput => (this.commentBodyInput = commentBodyInput)}
+      />
+      <br />
+      <b>Author </b>
+      <input
+        type="text"
+        ref={commentAuthorInput => (this.commentAuthorInput = commentAuthorInput)}
+      />
+      <br />
+
+      <button
+        onClick={() => {
+          addCommentSubmit(props.hist, props.postId, props.addComment);
+        }}
+      >
+
+        Submit
+      </button>
+    </div>
+  );
+};
+
+
+export const EditComment = props => {
+  const comment = props.comment;
+
+  //console.log("comment", comment);
+  //console.log("------------>editComment", props.editComment);
+  if (comment== null) return <div />;
+
+
+  return (
+    <div className='post'>
+      <b>Comment</b>
+      <input
+        type="text"
+        defaultValue={comment.body}
+        ref={commentBodyInput => (this.commentBodyInput = commentBodyInput)}
+      />
+      <br />
+
+      <button
+        onClick={() => {
+          editCommentSubmit(props.hist, props.comment.id, props.editComment);
+        }}
+      >
+
+        Submit
+      </button>
+    </div>
+  );
+};
+
+
+
 const addPostSubmit = (hist, addPost) => {
-  console.log("title:", this.postTitleInput.value);
-  console.log("body:", this.postBodyInput.value);
-  console.log("category:", this.postCategoryInput.value);
-  console.log("addPost:", addPost);
-  console.log("hist:", hist);
+  //console.log("title:", this.postTitleInput.value);
+  //console.log("body:", this.postBodyInput.value);
+  //console.log("category:", this.postCategoryInput.value);
+  //console.log("addPost:", addPost);
+  //console.log("hist:", hist);
 
   const title = this.postTitleInput.value;
   const body = this.postBodyInput.value;
@@ -257,13 +340,13 @@ const addPostSubmit = (hist, addPost) => {
 
   addPost(hist, { id, title, body, category, owner, timestamp });
 
-  console.log("addPost done");
+  //console.log("addPost done");
 };
 
 const editPostSubmit = (hist, id, editPost) => {
-  console.log("title:", this.postTitleInput.value);
-  console.log("body:", this.postBodyInput.value);
-  console.log("history:", hist);
+  //console.log("title:", this.postTitleInput.value);
+  //console.log("body:", this.postBodyInput.value);
+  //console.log("history:", hist);
   const title = this.postTitleInput.value;
   const body = this.postBodyInput.value;
 
@@ -275,3 +358,56 @@ const editPostSubmit = (hist, id, editPost) => {
 
   editPost(hist, { id, title, body });
 };
+
+
+const addCommentSubmit = (hist, postId, addComment) => {
+  //console.log("commentBodyInput:", this.commentBodyInput.value);
+  //console.log("commentAuthorInput:", this.commentAuthorInput.value);
+
+  //console.log("hist:", hist);
+
+  const body = this.commentBodyInput.value;
+  const author = this.commentAuthorInput.value;
+  const parentId = postId
+  const timestamp = Date.now();
+  const id = timestamp;
+
+  if (
+    !this.commentBodyInput.value ||
+    !this.commentAuthorInput.value
+  ) {
+    return;
+  }
+
+  window.event.preventDefault();
+
+  addComment(hist, { id, body, author, parentId, timestamp });
+
+  //console.log("addComment done");
+};
+
+
+
+const editCommentSubmit = (hist, id, editComment) => {
+  //console.log("commentBodyInput:", this.commentBodyInput.value);
+  //console.log("commentAuthorInput:", this.commentAuthorInput.value);
+
+  //console.log("hist:", hist);
+
+  const body = this.commentBodyInput.value;
+  const timestamp = Date.now();
+
+  if (
+    !this.commentBodyInput.value 
+  ) {
+    return;
+  }
+
+  window.event.preventDefault();
+
+console.log('---->new comment', { id, body, timestamp });
+  editComment(hist, { id, body, timestamp });
+
+  //console.log("addComment done");
+};
+

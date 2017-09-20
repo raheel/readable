@@ -2,13 +2,14 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   loadPostRequest,
-  loadCommentsRequest,
   editPostRequest,
   addPostRequest,
+    loadCommentsRequest,
+  loadCommentRequest,
   addCommentRequest,
   editCommentRequest
 } from "../actions";
-import { EditPost, CreatePost } from "./ReadableComponents";
+import { EditPost, CreatePost, CreateComment, EditComment } from "./ReadableComponents";
 import { withRouter } from "react-router-dom";
 
 class CreateOrEditView extends Component {
@@ -38,8 +39,35 @@ class CreateOrEditView extends Component {
     const isCreate = "create" === this.props.mode;
     const addPost = this.props.addPost;
     const editPost = this.props.editPost;
-    const post = this.props.posts!=null && Array.isArray(this.props.posts) 
-    ? this.props.posts.find(post => post.id==id) : null;
+ const post = this.props.posts!=null && Array.isArray(this.props.posts); 
+    let comment = null;
+
+        console.log('**************-----comments----> asdfafsd asfd ', this.props.comments);
+
+    if (this.props.comments!=null){
+      for (let postId in this.props.comments){
+        console.log('___key', postId, this.props.comments);
+
+      }
+    }
+
+    console.log('Object.keys(this.props.comments)', Object.keys(this.props.comments));
+
+
+Object.keys(this.props.comments).map(postId =>  
+{
+  this.props.comments[postId].map(c =>
+    {
+      if (c.id==id){
+          comment = c;
+      }
+    }
+  )
+}
+);
+
+
+    console.log('_______________________comment', comment);
 
     console.log("create and post", isCreate, isPost, this.props.posts, post, addPost);
     if (isCreate) {
@@ -51,6 +79,14 @@ class CreateOrEditView extends Component {
           </div>
         );
       } else {
+        console.log('***in create comment');
+                return (
+
+                  <div>
+            Create Comment
+            <CreateComment hist={this.props.history} postId={id} addComment={this.props.addComment}/>
+          </div>
+                );
       }
     } else {
       if (isPost && post!=null) {
@@ -61,27 +97,37 @@ class CreateOrEditView extends Component {
           </div>
         );
       } else {
+        console.log('***in edit comment', comment);
+                return (
+
+                  <div>
+            Edit Comment
+            <EditComment hist={this.props.history} comment={comment} editComment={this.props.editComment}/>
+          </div>
+                );
       }
     }
 
-    return null;
   }
 }
 
-function mapStateToProps({ posts }) {
+function mapStateToProps({ posts, comments }) {
   return {
-    posts
+    posts,
+    comments
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     loadPost: id => dispatch(loadPostRequest(id)),
-    loadComments: id => dispatch(loadCommentsRequest(id)),
     editPost: (hist, post) => dispatch(editPostRequest(hist, post)),
     addPost: (hist, post) => dispatch(addPostRequest(hist, post)),
-    editComment: post => dispatch(editCommentRequest(post)),
-    addComment: post => dispatch(addCommentRequest(post))
+        loadComments: id => dispatch(loadCommentsRequest(id)),
+        loadComment: id => dispatch(loadCommentRequest(id)),
+
+    editComment: (hist, comment)  => dispatch(editCommentRequest(hist, comment)) ,
+    addComment: (hist, comment) => dispatch(addCommentRequest(hist, comment))
   };
 }
 

@@ -9,6 +9,7 @@ export const VOTE_POST = "VOTE_POST";
 export const SORT_POSTS = "SORT_POSTS";
 
 export const LOAD_COMMENTS = "LOAD_COMMENTS";
+export const LOAD_COMMENT = "LOAD_COMMENT";
 export const ADD_NEW_COMMENT = "ADD_NEW_COMMENT";
 export const EDIT_COMMENT = "EDIT_COMMENT";
 export const DELETE_COMMENT = "DELETE_COMMENT ";
@@ -92,6 +93,16 @@ export function loadCommentsRequest(id) {
   };
 }
 
+export function loadCommentRequest(id) {
+  let url = "comments/" + id;
+
+  return (dispatch, getState) => {
+    fetch(BASE_URL + url, GET_HEADER)
+      .then(response => response.json())
+      .then(comment => dispatch(loadComment(comment)));
+  };
+}
+
 export function addPostRequest(history, post) {
     console.log('addPostRequest', history, post);
   let {id, title, body, owner, category, timestamp} = post;
@@ -110,7 +121,8 @@ export function addPostRequest(history, post) {
 export function editPostRequest(history, post) {
   console.log('test_____________editPostRequest: post', post);
   let url = "posts/" + post.id ;
-  let postBody = {body: JSON.stringify(post)};
+
+  let postBody = {body: JSON.stringify({post})};
 
   return (dispatch, getState) => {
     fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER))
@@ -144,15 +156,37 @@ export function votePostRequest(id, option) {
 }
 
 
-export function addCommentRequest({ comment }) {
+export function addCommentRequest(history, comment) {
+    console.log('addCommentRequest', history, comment);
+  let {id, author, body, parentId, timestamp} = comment;
+  let url = 'comments ';
+  let postBody = {body: JSON.stringify({id, author, body, parentId, timestamp})};
+  console.log('postBody: ', postBody);
   return (dispatch, getState) => {
-    dispatch(addComment(comment));
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
+      .then(() => {
+        dispatch(addPost(comment));
+        history.push('/post/'+comment.parentId  );
+      });
   };
 }
 
-export function editCommentRequest({ comment }) {
+export function editCommentRequest(history, comment) {
+  console.log('editCommentRequest: comment', history, comment);
+  let url = "comments/" + comment.id ;
+
+  let postBody = {body: JSON.stringify(comment)};
+
   return (dispatch, getState) => {
-    dispatch(addComment(comment));
+    fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER))
+      .then(() => {
+                  console.log('editCommentRequest pushing history1: ');
+
+        dispatch(editComment(comment));
+          console.log('editCommentRequest pushing history2: ');
+
+        history.push('/post/'+comment.parentId  );
+      });
   };
 }
 
@@ -239,6 +273,14 @@ export function loadComments({ id, comments }) {
     type: LOAD_COMMENTS,
     id,
     comments
+  };
+}
+
+export function loadComment(comment) {
+  console.log('----comment, ', comment);
+  return {
+    type: LOAD_COMMENT,
+    comment
   };
 }
 
