@@ -30,12 +30,20 @@ function categories(state = {}, action) {
 
 function posts(state = {}, action) {
   switch (action.type) {
-    case LOAD_POSTS:
-      return action.posts;
-    case LOAD_POST:
+    case LOAD_POSTS:{
+      let newState = [];
+      action.posts.map(post => {
+        newState[post.id] = post;
+      })
+      return newState;
+    }
+    case LOAD_POST:{
+      let newState = state;
       let found = false;
       if (!Array.isArray(state)) {
-        return [action.post];
+        newState = [];
+        newState[action.post.id] = action.post;
+        return newState;
       }
 
       for (let post of state) {
@@ -44,14 +52,19 @@ function posts(state = {}, action) {
         }
       }
       if (!found) {
-        state.push(action.post);
+        newState[action.post.id] = action.post;
       }
-      return state;
+      return newState;
+  }
     case EDIT_POST:
       let newState = state;
            console.log("************EDIT_POST 1", newState, 'isarray', Array.isArray(newState));
 
       if (Array.isArray(newState)) {
+        if (!(action.post.id in newState)){
+          newState[action.post.id] = action.post;
+        }
+        else {
         newState = newState.map(post => {
           console.log("************EDIT_POST post ids, ", post.id, action.post.id);
           if (post.id == action.post.id) {
@@ -59,8 +72,10 @@ function posts(state = {}, action) {
           }
           return post;
         });
+      }
       } else {
-        newState = [action.post];
+        newState = [];
+        newState[action.post.id] = action.post;
       }
       console.log('newState', newState);
       return newState;
@@ -112,11 +127,6 @@ function comments(state = {}, action) {
   switch (action.type) {
     case LOAD_COMMENTS:
       let comments = action.comments;
-
-      comments.sort((comment1, comment2) => (
-        comment2.voteScore - comment1.voteScore
-      ));
-
       console.log('comments', comments);
       return {
         ...state,
@@ -180,7 +190,7 @@ function comments(state = {}, action) {
     case DELETE_COMMENT:{
       let newState = Object.assign({}, state);
       if (action.comment.parentId in newState) {
-        newState = newState[action.comment.parentId].map(comment => {
+        newState[action.comment.parentId] = newState[action.comment.parentId].map(comment => {
           if (comment.id == action.comment.id) {
             comment.deleted = "true";
           }

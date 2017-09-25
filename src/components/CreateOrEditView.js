@@ -39,7 +39,8 @@ class CreateOrEditView extends Component {
     const isCreate = "create" === this.props.mode;
     const addPost = this.props.addPost;
     const editPost = this.props.editPost;
- const post = this.props.posts!=null && Array.isArray(this.props.posts); 
+    console.log('this.props.posts:', this.props.posts);
+    const post = this.props.posts!=null && Array.isArray(this.props.posts) ? this.props.posts[id] : null; 
     let comment = null;
 
         console.log('**************-----comments----> asdfafsd asfd ', this.props.comments);
@@ -89,7 +90,11 @@ Object.keys(this.props.comments).map(postId =>
                 );
       }
     } else {
-      if (isPost && post!=null) {
+      if (isPost) {
+                console.log('***in edit post', post);
+if (post==null){
+  return null;
+}
         return (
           <div>
             Edit Post

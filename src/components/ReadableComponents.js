@@ -12,67 +12,30 @@ export const Category = props => {
 };
 
 export const Post = props => {
-  const {post, hist} = props;
+  const {post, comments, detailed, hist} = props;
+  console.log('----------postdetails, ', props);
   if (post == null || post.deleted!=false) return <div />;
+
+  if (comments!=null){
+    comments.sort((comment1, comment2) => (
+        comment2.voteScore - comment1.voteScore
+    ));
+  }
 
   return (
     <div className='post'>
       <Link to={`/post/${post.id}`}><b>{post.title}</b></Link><br/>
-
-      <br />
-      {post.body}<br />
-      Timestamp: {new Date(post.timestamp).toUTCString()}<br />
-      Vote Score: {post.voteScore}<br />
-
-          <Route
-              render={({ history }) =>
-          <button
-            type="button"
-             onClick={() => {
-              history.push('/create/post/' + post.category);
-            }}
-          >
-            New
-          </button>}
-      />
-
-      <Route
-        render={({ history }) =>
-          <button
-            type="button"
-             onClick={() => {
-              history.push('/edit/post/' + post.id);
-            }}
-          >
-                Edit
-            </button>}
-        />
-
-        <button onClick={() => props.deletePost(hist, post.id)}>Delete</button>
-
-  <br/>
-
-      <button onClick={() => props.votePost(post.id, "upVote")}>Upvote</button>
-      <button onClick={() => props.votePost(post.id, "downVote")}>Downvote</button>
-    </div>
-  );
-};
-
-export const PostDetails = props => {
-  const {post, hist} = props;
-  const comments = props.comments;
-  //console.log('----------postdetails, ', props);
-  if (post == null || post.deleted!=false) return <div />;
-
-  return (
-    <div className='post'>
-      <b>{post.title}</b><br/>
       {post.body}<br />
       Author: {post.author}<br />
       Timestamp: {new Date(post.timestamp).toUTCString()}<br />
       Vote Score: {post.voteScore}<br />
+
+      {detailed ?
+      <div>
       Category: {post.category}<br />
       Owner: {post.owner}<br />
+      </div>
+      : <div/>}
 
       <Route
         render={({ history }) =>
@@ -98,7 +61,7 @@ export const PostDetails = props => {
             </button>}
         />
 
-        <button onClick={() => props.deletePost(hist, post.id)}>Delete</button>
+        <button onClick={() => props.deletePost(post.id)}>Delete</button>
 
   <br/>
 
@@ -106,14 +69,15 @@ export const PostDetails = props => {
       <button onClick={() => props.votePost(post.id, "downVote")}>Downvote</button>
       
 
-          {comments != null && comments instanceof Array
+          {comments != null
             ? <div>
                 <br /><br /><br /><br />
                 <b> {comments.length == 0 ? "No" : ""} Comments</b>
                 <ul>
+
                   {comments.map(comment =>
                     <li  className='comment' key={comment.id}>
-                      <Comment comment={comment} voteComment={props.voteComment} />
+                      <Comment comment={comment} voteComment={props.voteComment}  deleteComment={props.deleteComment}/>
                     </li>
                   )}
                 </ul>
@@ -158,7 +122,7 @@ export const Comment = props => {
           </button>}
       />
 
-      <button onClick={() => props.delete(comment)}>Delete</button>
+      <button onClick={() => props.deleteComment(comment)}>Delete</button>
       <br/>
 
 
@@ -216,7 +180,7 @@ export const CreatePost = props => {
 export const EditPost = props => {
   const {post, hist} = props;
 
-  //console.log('editpost ', post);
+  console.log('editpost ', post);
   if (post == null) return <div />;
 
   return (

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { loadPostRequest, editPostRequest, deletePostRequest, votePostRequest,
 loadCommentsRequest, editCommentRequest, deleteCommentRequest, voteCommentRequest} from "../actions";
-import { PostDetails, Comment } from "./ReadableComponents";
+import { Post, Comment } from "./ReadableComponents";
 import { withRouter } from "react-router-dom";
 
 class PostDetailsView extends Component {
@@ -36,7 +36,7 @@ class PostDetailsView extends Component {
       return (
         <div>
           <h1 style={{display: 'flex', justifyContent: 'center'}}>Post Details</h1>
-          <PostDetails post={post} comments={comments} hist={this.props.history}
+          <Post detailed="true" post={post} comments={comments} hist={this.props.history}
           votePost={this.props.votePost} editPost={this.props.editPost} deletePost={this.props.deletePost}
           voteComment={this.props.voteComment} deleteComment={this.props.deleteComment}/>
         </div>
