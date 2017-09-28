@@ -24,8 +24,6 @@ class DefaultView extends Component {
   }
 
   render() {
-    console.log("-----------------render");
-
     const categories = this.props.categories.categories;
     const posts = this.props.posts;
 
@@ -53,16 +51,29 @@ class DefaultView extends Component {
   }
 
   sortAndDisplayPosts(posts) {
-    console.log('-----------posts', posts);
-    this.sortPosts(posts);
+    posts = this.sortPosts(posts);
     return this.displayPosts(posts);
   }
 
   displayPosts(posts) {
-    console.log("posts", posts);
-    console.log("------displayPosts", posts instanceof Array, posts != null);
     {
-      return posts != null && posts instanceof Array
+      let items = posts.map(post => {
+
+        return (
+          <li key={post.id}>
+            <Post
+              detailed="false"
+              post={post}
+              hist={this.props.history}
+              votePost={this.props.votePost}
+              editPost={this.props.editPost}
+              deletePost={this.props.deletePost}
+            />
+          </li>
+        );
+      });
+
+      return posts != null
         ? <div>
             <h1 style={{ display: "flex", justifyContent: "center" }}>Posts</h1>
             <div style={{ margin: "0 auto", width: "50%" }}>
@@ -74,24 +85,7 @@ class DefaultView extends Component {
               </select>
             </div>
             <ul>
-              asdfafd
-              {
-
-                posts.map(id => {
-                let post = posts[id];
-                console.log('----post, id', post, id)
-                return
-                (<li key={id}>
-                  <Post
-                    detailed="false"
-                    post={post}
-                    hist={this.props.history}
-                    votePost={this.props.votePost}
-                    editPost={this.props.editPost}
-                    deletePost={this.props.deletePost}
-                  />
-                </li>)
-              })}
+              {items}
             </ul>
           </div>
         : <div />;
@@ -100,10 +94,12 @@ class DefaultView extends Component {
 
   sortPosts(event) {
     let posts = this.props.posts;
-    if (posts == null || !(posts instanceof Array)) {
+    if (posts == null) {
       return;
     }
-    console.log("-------posts:", posts);
+
+    posts = Object.keys(posts).map(id => posts[id]);
+
     let sortBy = this.state.sortBy;
     if (event.target) {
       let sortBy = event.target.value;
@@ -113,11 +109,13 @@ class DefaultView extends Component {
 
     posts.sort((post1, post2) => {
       if (sortBy === "voteScore") {
-        return post1.voteScore - post2.voteScore;
+        return post2.voteScore - post1.voteScore;
       } else if (sortBy === "timestamp") {
         return post1.timestamp - post2.timestamp;
       }
     });
+
+    return posts;
   }
 }
 
@@ -133,7 +131,7 @@ function mapDispatchToProps(dispatch) {
     loadCategoriesRequest: () => dispatch(loadCategoriesRequest()),
     loadAllPosts: () => dispatch(loadPostsRequest("all")),
     editPost: (hist, post) => dispatch(editPostRequest(hist, post)),
-    deletePost: id => dispatch(deletePostRequest(id)),
+    deletePost: (hist, post) => dispatch(deletePostRequest(hist, post)),
     votePost: (id, mode) => dispatch(votePostRequest(id, mode))
   };
 }

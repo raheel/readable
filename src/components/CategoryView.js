@@ -41,84 +41,87 @@ class CategoryView extends Component {
   render() {
     const category = this.props.match.params.name;
     let posts = this.props.posts;
-                console.log('---posts', posts);
 
-    if (Object.keys(posts).length== 0) {
+    if (Object.keys(posts).length == 0) {
       return (
         <div>
-            <h1 style={{ display: "flex", justifyContent: "center" }}>No Posts</h1>
+          <h1 style={{ display: "flex", justifyContent: "center" }}>
+            No Posts
+          </h1>
 
           {newPostButton}
         </div>
       );
     }
 
-                    console.log('---*****posts', posts);
-
-      console.log("printing id");
-
-    posts = posts.filter(id => {
-      console.log("id");
-      return posts[id].category === category
+    posts = Object.keys(posts).map(id => posts[id]).filter(post => {
+      return post.category === category;
     });
-                console.log('--->>>>posts', posts);
+
+    posts = this.sortPosts(this.state.sortBy, posts);
 
     return (
       <div>
 
-      {this.displayPosts(posts)}
+        {this.displayPosts(posts)}
       </div>
     );
   }
 
-    displayPosts(posts) {
-                console.log('posts', posts);
-
-    {
-      return posts != null && posts instanceof Array
-        ? <div>
-            <h1 style={{ display: "flex", justifyContent: "center" }}>Posts</h1>
-            <div style={{ margin: "0 auto", width: "50%" }}>
-                  {newPostButton}
-<br/>
-              Sort By{" "}
-              <select value={this.state.sortBy} onChange={this.sortPosts}>
-                <option value="voteScore">Vote Score</option>
-                <option value="timestamp">Date</option>
-              </select>
-            </div>
-            <ul>
-              {
-                posts.map(id =>
-                <li key={id}>
-                  <Post detailed="false" post={posts[id]} hist={this.props.history}
-          votePost={this.props.votePost} editPost={this.props.editPost} deletePost={this.props.deletePost}
+  displayPosts(posts) {
+    let items = null;
+    if (posts != null) {
+      items = posts.map(post =>
+        <li key={post.id}>
+          <Post
+            detailed="false"
+            post={post}
+            hist={this.props.history}
+            votePost={this.props.votePost}
+            editPost={this.props.editPost}
+            deletePost={this.props.deletePost}
           />
-                </li>
-              )}
-            </ul>
-          </div>
-        : <div />;
+        </li>
+      );
     }
+
+    return posts != null
+      ? <div>
+          <h1 style={{ display: "flex", justifyContent: "center" }}>Posts</h1>
+          <div style={{ margin: "0 auto", width: "50%" }}>
+            {newPostButton}
+            <br />
+            Sort By{" "}
+            <select
+              value={this.state.sortBy}
+              onChange={event => {
+                let sortBy = event.target.value;
+
+                this.setState({ sortBy });
+                this.sortPosts(sortBy, posts);
+              }}
+            >
+              <option value="voteScore">Vote Score</option>
+              <option value="timestamp">Date</option>
+            </select>
+          </div>
+          <ul>
+            {items}
+          </ul>
+        </div>
+      : <div />;
   }
 
-  sortPosts(event) {
-    let posts = this.props.posts;
-    let sortBy = this.getState('sortBy');
-    if (event.target){
-    let sortBy = event.target.value;
-
-    this.setState({ sortBy });
-    }
+  sortPosts(sortBy, posts) {
     posts.sort((post1, post2) => {
       if (sortBy === "voteScore") {
-        return post1.voteScore - post2.voteScore;
+        return post2.voteScore - post1.voteScore;
       } else if (sortBy === "timestamp") {
         return post1.timestamp - post2.timestamp;
       }
     });
 
-    this.displayPosts(posts);
+    return posts;
   }
 }
 

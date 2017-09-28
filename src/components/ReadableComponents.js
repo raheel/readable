@@ -12,40 +12,53 @@ export const Category = props => {
 };
 
 export const Post = props => {
-  const {post, comments, detailed, hist} = props;
-  console.log('----------postdetails, ', props);
-  if (post == null || post.deleted!=false) return <div />;
+  const { post, comments, detailed, hist } = props;
 
-  if (comments!=null){
-    comments.sort((comment1, comment2) => (
-        comment2.voteScore - comment1.voteScore
-    ));
+  if (post == null || post.deleted != false) return <div />;
+
+  if (comments != null) {
+    comments.sort(
+      (comment1, comment2) => comment2.voteScore - comment1.voteScore
+    );
   }
 
+  let filteredComments = null;
+  if (comments != null) {
+    filteredComments = comments.filter(
+      comment => comment.deleted !== "true" && comment.deleted !== true
+    );
+  }
+  let hasComments = filteredComments == null
+    ? false
+    : filteredComments.length > 0;
+
   return (
-    <div className='post'>
-      <Link to={`/post/${post.id}`}><b>{post.title}</b></Link><br/>
+    <div className="post">
+      <Link to={`/post/${post.id}`}><b>{post.title}</b></Link><br />
       {post.body}<br />
       Author: {post.author}<br />
       Timestamp: {new Date(post.timestamp).toUTCString()}<br />
       Vote Score: {post.voteScore}<br />
 
-      {detailed ?
-      <div>
-      Category: {post.category}<br />
-      Owner: {post.owner}<br />
-      </div>
-      : <div/>}
+      {detailed
+        ? <div>
+            Category:
+            <Link to={`/category/${post.category}`}>{post.category}</Link><br />
+
+            Owner: {post.owner}<br />
+          </div>
+        : <div />}
 
       <Route
         render={({ history }) =>
           <button
             type="button"
-             onClick={() => {
-              history.push('/create/post/' + post.category);
+            onClick={() => {
+              history.push("/create/post/" + post.category);
             }}
           >
             New
+
           </button>}
       />
 
@@ -53,43 +66,61 @@ export const Post = props => {
         render={({ history }) =>
           <button
             type="button"
-             onClick={() => {
-              history.push('/edit/post/' + post.id);
+            onClick={() => {
+              history.push("/edit/post/" + post.id);
             }}
           >
-              Edit
-            </button>}
-        />
+            Edit
+          </button>}
+      />
 
-        <button onClick={() => props.deletePost(post.id)}>Delete</button>
+      <button onClick={() => props.deletePost(hist, post)}>Delete</button>
 
-  <br/>
+      <br />
 
       <button onClick={() => props.votePost(post.id, "upVote")}>Upvote</button>
-      <button onClick={() => props.votePost(post.id, "downVote")}>Downvote</button>
-      
+      <button onClick={() => props.votePost(post.id, "downVote")}>
+        Downvote
+      </button>
 
-          {comments != null
-            ? <div>
-                <br /><br /><br /><br />
-                <b> {comments.length == 0 ? "No" : ""} Comments</b>
-                <ul>
+      {filteredComments != null
+        ? <div>
+            <br /><br /><br /><br />
+            <b> {!hasComments ? "No" : ""} Comments</b><br />
+            <Route
+              render={({ history }) =>
+                <button
+                  type="button"
+                  onClick={() => {
+                    history.push("/create/comment/" + post.id);
+                  }}
+                >
+                  New
+                </button>}
+            />
 
-                  {comments.map(comment =>
-                    <li  className='comment' key={comment.id}>
-                      <Comment comment={comment} voteComment={props.voteComment}  deleteComment={props.deleteComment}/>
-                    </li>
-                  )}
-                </ul>
-              </div>
-            : <div />}
+            <ul>
+
+              {filteredComments.length != 0 &&
+                filteredComments.map(comment =>
+                  <li className="comment" key={comment.id}>
+                    <Comment
+                      comment={comment}
+                      voteComment={props.voteComment}
+                      deleteComment={props.deleteComment}
+                    />
+                  </li>
+                )}
+            </ul>
+          </div>
+        : <div />}
     </div>
   );
 };
 
 export const Comment = props => {
   const comment = props.comment;
-  if (comment == null || comment.deleted!=false ) return <div />;
+  if (comment == null || comment.deleted != false) return <div />;
   return (
     <div>
       <b>{comment.title}</b><br />
@@ -102,8 +133,8 @@ export const Comment = props => {
         render={({ history }) =>
           <button
             type="button"
-             onClick={() => {
-              history.push('/create/comment/' + comment.parentId);
+            onClick={() => {
+              history.push("/create/comment/" + comment.parentId);
             }}
           >
             New
@@ -114,8 +145,8 @@ export const Comment = props => {
         render={({ history }) =>
           <button
             type="button"
-             onClick={() => {
-              history.push('/edit/comment/' + comment.id);
+            onClick={() => {
+              history.push("/edit/comment/" + comment.id);
             }}
           >
             Edit
@@ -123,27 +154,34 @@ export const Comment = props => {
       />
 
       <button onClick={() => props.deleteComment(comment)}>Delete</button>
-      <br/>
+      <br />
 
+      <button
+        onClick={() =>
+          props.voteComment(comment.parentId, comment.id, "upVote")}
+      >
+        Upvote
+      </button>
+      <button
+        onClick={() =>
+          props.voteComment(comment.parentId, comment.id, "downVote")}
+      >
+        Downvote
+      </button>
 
-      <button onClick={() => props.voteComment(comment.parentId, comment.id, "upVote")}>Upvote</button>
-      <button onClick={() => props.voteComment(comment.parentId, comment.id, "downVote")}>Downvote</button>
-
-
-          </div>
-
+    </div>
   );
 };
 
 export const CreatePost = props => {
   const category = props.category;
 
-  //console.log("category", category);
-  //console.log("------------>addPost", props.addPost);
+  //
+  //
   if (category == null) return <div />;
 
   return (
-    <div className='post'>
+    <div className="post">
       <b>Post Title </b>
       <input
         type="text"
@@ -178,13 +216,12 @@ export const CreatePost = props => {
 };
 
 export const EditPost = props => {
-  const {post, hist} = props;
+  const { post, hist } = props;
 
-  console.log('editpost ', post);
   if (post == null) return <div />;
 
   return (
-    <div className='post'>
+    <div className="post">
       <b>Post Title </b>
       <input
         type="text"
@@ -214,12 +251,12 @@ export const EditPost = props => {
 export const CreateComment = props => {
   const postId = props.postId;
 
-  //console.log("postId", postId);
-  //console.log("------------>addComment", props.addComment);
+  //
+  //
   if (props.postId == null) return <div />;
 
   return (
-    <div className='post'>
+    <div className="post">
       <b>Comment</b>
       <input
         type="text"
@@ -229,7 +266,8 @@ export const CreateComment = props => {
       <b>Author </b>
       <input
         type="text"
-        ref={commentAuthorInput => (this.commentAuthorInput = commentAuthorInput)}
+        ref={commentAuthorInput =>
+          (this.commentAuthorInput = commentAuthorInput)}
       />
       <br />
 
@@ -245,17 +283,15 @@ export const CreateComment = props => {
   );
 };
 
-
 export const EditComment = props => {
   const comment = props.comment;
 
-  //console.log("comment", comment);
-  //console.log("------------>editComment", props.editComment);
-  if (comment== null) return <div />;
-
+  //
+  //
+  if (comment == null) return <div />;
 
   return (
-    <div className='post'>
+    <div className="post">
       <b>Comment</b>
       <input
         type="text"
@@ -276,14 +312,12 @@ export const EditComment = props => {
   );
 };
 
-
-
 const addPostSubmit = (hist, addPost) => {
-  //console.log("title:", this.postTitleInput.value);
-  //console.log("body:", this.postBodyInput.value);
-  //console.log("category:", this.postCategoryInput.value);
-  //console.log("addPost:", addPost);
-  //console.log("hist:", hist);
+  //
+  //
+  //
+  //
+  //
 
   const title = this.postTitleInput.value;
   const body = this.postBodyInput.value;
@@ -304,13 +338,13 @@ const addPostSubmit = (hist, addPost) => {
 
   addPost(hist, { id, title, body, category, owner, timestamp });
 
-  //console.log("addPost done");
+  //
 };
 
 const editPostSubmit = (hist, id, editPost) => {
-  //console.log("title:", this.postTitleInput.value);
-  //console.log("body:", this.postBodyInput.value);
-  //console.log("history:", hist);
+  //
+  //
+  //
   const title = this.postTitleInput.value;
   const body = this.postBodyInput.value;
 
@@ -323,23 +357,19 @@ const editPostSubmit = (hist, id, editPost) => {
   editPost(hist, { id, title, body });
 };
 
-
 const addCommentSubmit = (hist, postId, addComment) => {
-  //console.log("commentBodyInput:", this.commentBodyInput.value);
-  //console.log("commentAuthorInput:", this.commentAuthorInput.value);
+  //
+  //
 
-  //console.log("hist:", hist);
+  //
 
   const body = this.commentBodyInput.value;
   const author = this.commentAuthorInput.value;
-  const parentId = postId
+  const parentId = postId;
   const timestamp = Date.now();
   const id = timestamp;
 
-  if (
-    !this.commentBodyInput.value ||
-    !this.commentAuthorInput.value
-  ) {
+  if (!this.commentBodyInput.value || !this.commentAuthorInput.value) {
     return;
   }
 
@@ -347,32 +377,27 @@ const addCommentSubmit = (hist, postId, addComment) => {
 
   addComment(hist, { id, body, author, parentId, timestamp });
 
-  //console.log("addComment done");
+  //
 };
 
-
-
 const editCommentSubmit = (hist, comment, editComment) => {
-  //console.log("commentBodyInput:", this.commentBodyInput.value);
-  //console.log("commentAuthorInput:", this.commentAuthorInput.value);
+  //
+  //
 
-  //console.log("hist:", hist);
+  //
 
   const body = this.commentBodyInput.value;
   const timestamp = Date.now();
 
-  if (
-    !this.commentBodyInput.value 
-  ) {
+  if (!this.commentBodyInput.value) {
     return;
   }
 
   window.event.preventDefault();
-let parentId = comment.parentId;
-let id = comment.id; 
-console.log('---->new comment', { id, parentId, body, timestamp });
+  let parentId = comment.parentId;
+  let id = comment.id;
+
   editComment(hist, { id, parentId, body, timestamp });
 
-  //console.log("addComment done");
+  //
 };
-

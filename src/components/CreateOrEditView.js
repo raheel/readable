@@ -4,12 +4,17 @@ import {
   loadPostRequest,
   editPostRequest,
   addPostRequest,
-    loadCommentsRequest,
+  loadCommentsRequest,
   loadCommentRequest,
   addCommentRequest,
   editCommentRequest
 } from "../actions";
-import { EditPost, CreatePost, CreateComment, EditComment } from "./ReadableComponents";
+import {
+  EditPost,
+  CreatePost,
+  CreateComment,
+  EditComment
+} from "./ReadableComponents";
 import { withRouter } from "react-router-dom";
 
 class CreateOrEditView extends Component {
@@ -32,87 +37,109 @@ class CreateOrEditView extends Component {
     // const category = this.props.match.params.name;
     // const posts = this.props.posts ? this.props.posts[category] : null;
 
-    console.log("props createoreditview hist", this.props.history);
-
     const isPost = "post" === this.props.match.params.type;
-    const id = this.props.match.params.id ? this.props.match.params.id : '';
+    const id = this.props.match.params.id ? this.props.match.params.id : "";
     const isCreate = "create" === this.props.mode;
     const addPost = this.props.addPost;
     const editPost = this.props.editPost;
-    console.log('this.props.posts:', this.props.posts);
-    const post = this.props.posts!=null && Array.isArray(this.props.posts) ? this.props.posts[id] : null; 
+    const post = this.props.posts[id];
+    console.log(
+      "----post id:",
+      id,
+      "keys",
+      Object.keys(this.props.posts),
+      "posts",
+      this.props.posts
+    );
+
     let comment = null;
 
-        console.log('**************-----comments----> asdfafsd asfd ', this.props.comments);
-
-    if (this.props.comments!=null){
-      for (let postId in this.props.comments){
-        console.log('___key', postId, this.props.comments);
-
+    if (this.props.comments != null) {
+      for (let postId in this.props.comments) {
       }
     }
 
-    console.log('Object.keys(this.props.comments)', Object.keys(this.props.comments));
+    console.log(
+      "Object.keys(this.props.comments)",
+      Object.keys(this.props.comments)
+    );
 
-
-Object.keys(this.props.comments).map(postId =>  
-{
-  this.props.comments[postId].map(c =>
-    {
-      if (c.id==id){
+    Object.keys(this.props.comments).map(postId => {
+      this.props.comments[postId].map(c => {
+        if (c.id == id) {
           comment = c;
-      }
-    }
-  )
-}
-);
+        }
+      });
+    });
 
-
-    console.log('_______________________comment', comment);
-
-    console.log("create and post", isCreate, isPost, this.props.posts, post, addPost);
+    console.log(
+      "create and post",
+      isCreate,
+      isPost,
+      this.props.posts,
+      post,
+      addPost
+    );
     if (isCreate) {
       if (isPost) {
         return (
           <div>
-            Create Post
-            <CreatePost hist={this.props.history} category={id} addPost={addPost} />
+            <h1 style={{ display: "flex", justifyContent: "center" }}>
+              Create Post
+            </h1>
+            <CreatePost
+              hist={this.props.history}
+              category={id}
+              addPost={addPost}
+            />
           </div>
         );
       } else {
-        console.log('***in create comment');
-                return (
-
-                  <div>
-            Create Comment
-            <CreateComment hist={this.props.history} postId={id} addComment={this.props.addComment}/>
+        return (
+          <div>
+            <h1 style={{ display: "flex", justifyContent: "center" }}>
+              Create Comment
+            </h1>
+            <CreateComment
+              hist={this.props.history}
+              postId={id}
+              addComment={this.props.addComment}
+            />
           </div>
-                );
+        );
       }
     } else {
       if (isPost) {
-                console.log('***in edit post', post);
-if (post==null){
-  return null;
-}
+        if (post == null) {
+          return null;
+        }
         return (
           <div>
-            Edit Post
-            <EditPost hist={this.props.history} post={post} editPost={editPost} />
+            <h1 style={{ display: "flex", justifyContent: "center" }}>
+              Edit Post
+            </h1>
+            <EditPost
+              hist={this.props.history}
+              post={post}
+              editPost={editPost}
+            />
           </div>
         );
       } else {
-        console.log('***in edit comment', comment);
-                return (
-
-                  <div>
-            Edit Comment
-            <EditComment hist={this.props.history} comment={comment} editComment={this.props.editComment}/>
+        return (
+          <div>
+            <h1 style={{ display: "flex", justifyContent: "center" }}>
+              Edit Comment
+            </h1>
+            <EditComment
+              hist={this.props.history}
+              comment={comment}
+              editComment={this.props.editComment}
+            />
           </div>
-                );
+        );
       }
     }
-
   }
 }
 
@@ -128,12 +155,14 @@ function mapDispatchToProps(dispatch) {
     loadPost: id => dispatch(loadPostRequest(id)),
     editPost: (hist, post) => dispatch(editPostRequest(hist, post)),
     addPost: (hist, post) => dispatch(addPostRequest(hist, post)),
-        loadComments: id => dispatch(loadCommentsRequest(id)),
-        loadComment: id => dispatch(loadCommentRequest(id)),
+    loadComments: id => dispatch(loadCommentsRequest(id)),
+    loadComment: id => dispatch(loadCommentRequest(id)),
 
-    editComment: (hist, comment)  => dispatch(editCommentRequest(hist, comment)) ,
+    editComment: (hist, comment) => dispatch(editCommentRequest(hist, comment)),
     addComment: (hist, comment) => dispatch(addCommentRequest(hist, comment))
   };
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateOrEditView));
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(CreateOrEditView)
+);

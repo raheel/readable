@@ -30,74 +30,58 @@ function categories(state = {}, action) {
 
 function posts(state = {}, action) {
   switch (action.type) {
-    case LOAD_POSTS:{
-      let newState = [];
+    case LOAD_POSTS: {
+      let newState = Object.assign({}, state);
       action.posts.map(post => {
         newState[post.id] = post;
-      })
+      });
+
       return newState;
     }
-    case LOAD_POST:{
-      let newState = state;
-      let found = false;
-      if (!Array.isArray(state)) {
-        newState = [];
-        newState[action.post.id] = action.post;
-        return newState;
-      }
+    case LOAD_POST: {
+      let newState = Object.assign({}, state);
 
-      for (let post of state) {
-        if (post.id === action.post.id) {
-          found = true;
-        }
-      }
-      if (!found) {
-        newState[action.post.id] = action.post;
-      }
+      newState[action.post.id] = action.post;
+
       return newState;
-  }
+    }
     case EDIT_POST:
-      let newState = state;
-           console.log("************EDIT_POST 1", newState, 'isarray', Array.isArray(newState));
+      let newState = Object.assign({}, state);
 
-      if (Array.isArray(newState)) {
-        if (!(action.post.id in newState)){
-          newState[action.post.id] = action.post;
-        }
-        else {
-        newState = newState.map(post => {
-          console.log("************EDIT_POST post ids, ", post.id, action.post.id);
-          if (post.id == action.post.id) {
-              post = Object.assign({},action.post,post);
-          }
-          return post;
-        });
-      }
-      } else {
-        newState = [];
-        newState[action.post.id] = action.post;
-      }
-      console.log('newState', newState);
+      newState[action.post.id] = Object.assign(
+        newState[action.post.id],
+        action.post
+      );
+
       return newState;
-    case ADD_NEW_POST:
-      if (Array.isArray(state)) {
-        state.push(action.post);
-      }
-      return state;
-    case DELETE_POST:
-      if (Array.isArray(state)) {
-        state = state.map(post => {
-          if (post.id == action.id) {
-            post.deleted = "true";
+    case ADD_NEW_POST: {
+      let newState = Object.assign({}, state);
+
+      newState[action.post.id] = action.post;
+
+      return newState;
+    }
+    case DELETE_POST: {
+      let newState = Object.assign({}, state);
+      
+
+      if (Object.keys(state).length !== 0) {
+        Object.keys(newState).forEach((id, index) => {
+          if (id == action.id) {
+            newState[id].deleted = true;
           }
-          return post;
         });
       }
-      return state;
-    case VOTE_POST:
-      if (Array.isArray(state)) {
-        state = state.map(post => {
-          console.log("VOTE_POST post, ", post);
+
+      console.log('DELETE_POST newState: ', newState);
+      return newState;
+    }
+    case VOTE_POST: {
+      let newState = Object.assign({}, state);
+
+      if (Object.keys(newState).length != 0) {
+        newState = Object.keys(newState).map(id => {
+          let post = newState[id];
           if (post.id == action.id) {
             action.option == "upVote"
               ? (post.voteScore = post.voteScore + 1)
@@ -106,18 +90,9 @@ function posts(state = {}, action) {
           return post;
         });
       }
-      return state;
-    case SORT_POSTS:
-      if (Array.isArray(state)) {
-        state.sort((post1, post2) => {
-          if (action.sortBy === "voteScore") {
-            return post1.voteScore - post2.score;
-          } else if (action.sortBy === "timestamp") {
-            return post1.timestamp.localeCompare(post2.timestamp);
-          }
-        });
-      }
-      return state;
+
+      return newState;
+    }
     default:
       return state;
   }
@@ -127,46 +102,39 @@ function comments(state = {}, action) {
   switch (action.type) {
     case LOAD_COMMENTS:
       let comments = action.comments;
-      console.log('comments', comments);
+
       return {
         ...state,
         [action.id]: comments
       };
     case LOAD_COMMENT:
-     console.log('^^^^^^^^^^LOAD_COMMENT');
       let postId = action.comment.parentId;
       let st = Object.assign({}, state);
       let found = false;
       if (!(postId in st)) {
         st[postId] = [action.comment];
-                        console.log('^^^^^^^^^^st[postId] ', st, postId);
 
         return st;
       }
 
-                console.log('^^^^^^^^^^st[postId] ', st, postId);
+      st[postId] = st[postId].map(comment => {
+        comment = Object.assign({}, comment, action.comment);
+        found = true;
 
-
-      st[postId] = st[postId].map(comment =>{
-          comment = Object.assign({}, comment, action.comment);
-          found = true;
-          console.log('^^^^^^^^^^reducer comment', comment);
-          return comment;
-      })
-
-          console.log('^^^^^^^^^^reducer st', st);
-
+        return comment;
+      });
 
       if (!found) {
         st[postId].push(action.comment);
-      }      
+      }
       return st;
-    case EDIT_COMMENT:{
-      console.log('----action.comment ', action.comment);
+    case EDIT_COMMENT: {
       let newState = Object.assign({}, state);
       if (action.comment.parentId in newState) {
-        newState[action.comment.parentId] = newState[action.comment.parentId].map(comment =>{
-          if (comment.id==action.comment.id){
+        newState[action.comment.parentId] = newState[
+          action.comment.parentId
+        ].map(comment => {
+          if (comment.id == action.comment.id) {
             comment = Object.assign(comment, action.comment);
           }
           return comment;
@@ -174,23 +142,25 @@ function comments(state = {}, action) {
       } else {
         newState[action.comment.parentId] = [action.comment];
       }
-   
+
       return newState;
-       }
-    case ADD_NEW_COMMENT:{
+    }
+    case ADD_NEW_COMMENT: {
       let newState = Object.assign({}, state);
       if (action.comment.parentId in newState) {
         newState[action.comment.parentId].push(action.comment);
       } else {
         newState[action.comment.parentId] = [action.comment];
       }
-   
-      return newState; 
+
+      return newState;
     }
-    case DELETE_COMMENT:{
+    case DELETE_COMMENT: {
       let newState = Object.assign({}, state);
       if (action.comment.parentId in newState) {
-        newState[action.comment.parentId] = newState[action.comment.parentId].map(comment => {
+        newState[action.comment.parentId] = newState[
+          action.comment.parentId
+        ].map(comment => {
           if (comment.id == action.comment.id) {
             comment.deleted = "true";
           }
@@ -201,7 +171,7 @@ function comments(state = {}, action) {
     }
     case VOTE_COMMENT: {
       let newState = Object.assign({}, state);
-      if (state != null) {
+      if (newState != null) {
         newState[action.postId] = newState[action.postId].map(comment => {
           if (comment.id == action.commentId) {
             action.option == "upVote"
@@ -213,15 +183,11 @@ function comments(state = {}, action) {
       }
 
       newState[action.postId].sort(
-        (comment1, comment2) => (
-          comment2.voteScore - comment2.voteScore
-        )
+        (comment1, comment2) => comment2.voteScore - comment2.voteScore
       );
 
-      console.log('comments', newState[action.postId]);
-
       return newState;
-  }
+    }
     default:
       return state;
   }

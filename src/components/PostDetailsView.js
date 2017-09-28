@@ -19,16 +19,11 @@ class PostDetailsView extends Component {
     let post = null;
 
     console.log('=====render ', this.props)
-    if (posts==null || !Array.isArray(posts)){
+    if (posts==null || Object.keys(posts).length==0){
       return null;
     }
 
-    for (let p of posts) {
-      if (p.id == id) {
-        post = p;
-      }
-    }
-
+    post = posts[id];
 
     const comments = this.props.comments ? this.props.comments[id] : null;
 
@@ -60,7 +55,7 @@ function mapDispatchToProps(dispatch) {
   return {
     loadPost: id => dispatch(loadPostRequest(id)),
     editPost: (hist, post) => dispatch(editPostRequest(hist, post)),    
-    deletePost: (id) => dispatch(deletePostRequest(id)),    
+    deletePost: (hist, post) => dispatch(deletePostRequest(hist, post)),    
     votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
     loadComments: id => dispatch(loadCommentsRequest(id)),
     editComment: comment => dispatch(editCommentRequest(comment)),    

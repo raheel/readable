@@ -122,7 +122,7 @@ export function editPostRequest(history, post) {
   console.log('test_____________editPostRequest: post', post);
   let url = "posts/" + post.id ;
 
-  let postBody = {body: JSON.stringify({post})};
+  let postBody = {body: JSON.stringify(post)};
 
   return (dispatch, getState) => {
     fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER))
@@ -133,14 +133,19 @@ export function editPostRequest(history, post) {
   };
 }
 
-export function deletePostRequest(id) {
-  let url = "posts/" + id ;
+export function deletePostRequest(history, post) {
+  let url = "posts/" + post.id ;
 
   return (dispatch, getState) => {
     fetch(BASE_URL + url, DELETE_HEADER)
       .then(() => {
-        dispatch(deletePost(id));
-        alert('Succesfully deleted post with id' + id);
+        dispatch(deletePost(post.id));
+        alert('Succesfully deleted post with title ' + post.title);
+        console.log('history', history);
+        if (history && history.location.pathname.startsWith('/post')){
+          history.push('/category/'+post.category);
+        }
+
       });    
   };
 }
@@ -191,13 +196,13 @@ export function editCommentRequest(history, comment) {
 }
 
 export function deleteCommentRequest(comment) {
-  let url = "posts/" + comment.id ;
+  let url = "comments/" + comment.id ;
 
   return (dispatch, getState) => {
     fetch(BASE_URL + url, DELETE_HEADER)
       .then(() => {
         dispatch(deleteComment(comment));
-        alert('Succesfully deleted comment with id' + comment.id);
+        alert('Succesfully deleted comment starting with ' + comment.body.substring(0, 10));
       });    
   };}
 
