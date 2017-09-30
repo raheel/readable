@@ -79,15 +79,14 @@ function posts(state = {}, action) {
     case VOTE_POST: {
       let newState = Object.assign({}, state);
 
-      if (Object.keys(newState).length != 0) {
-        newState = Object.keys(newState).map(id => {
-          let post = newState[id];
-          if (post.id == action.id) {
+      if (Object.keys(newState).length !== 0) {
+        Object.keys(newState).forEach((id, index) => {
+          if (id == action.id) {
+            let post = newState[id];
             action.option == "upVote"
               ? (post.voteScore = post.voteScore + 1)
               : (post.voteScore = post.voteScore - 1);
           }
-          return post;
         });
       }
 
@@ -107,27 +106,30 @@ function comments(state = {}, action) {
         ...state,
         [action.id]: comments
       };
-    case LOAD_COMMENT:
+    case LOAD_COMMENT:{
       let postId = action.comment.parentId;
-      let st = Object.assign({}, state);
+      let newState = Object.assign({}, state);
       let found = false;
-      if (!(postId in st)) {
-        st[postId] = [action.comment];
+      if (!(postId in newState)) {
+        newState[postId] = [action.comment];
 
-        return st;
+        return newState;
       }
 
-      st[postId] = st[postId].map(comment => {
-        comment = Object.assign({}, comment, action.comment);
-        found = true;
+      newState[postId] = newState[postId].map(comment => {
+        if (action.comment.id==comment.id){
+          comment = Object.assign({}, comment, action.comment);
+          found = true;
+        }
 
         return comment;
       });
 
       if (!found) {
-        st[postId].push(action.comment);
+        newState[postId].push(action.comment);
       }
-      return st;
+      return newState;
+    }
     case EDIT_COMMENT: {
       let newState = Object.assign({}, state);
       if (action.comment.parentId in newState) {
@@ -142,7 +144,7 @@ function comments(state = {}, action) {
       } else {
         newState[action.comment.parentId] = [action.comment];
       }
-
+      console.log('comments edit', newState)
       return newState;
     }
     case ADD_NEW_COMMENT: {
@@ -152,6 +154,7 @@ function comments(state = {}, action) {
       } else {
         newState[action.comment.parentId] = [action.comment];
       }
+      console.log('comments add', newState)
 
       return newState;
     }

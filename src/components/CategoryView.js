@@ -20,9 +20,12 @@ class CategoryView extends Component {
   }
 
   componentDidMount() {
-    const category = this.props.match.params.name;
+    
+    const category = this.props.match.params.category;
+    
     this.props.loadPosts(category);
 
+  
     newPostButton = (
       <Route
         render={({ history }) =>
@@ -39,8 +42,11 @@ class CategoryView extends Component {
   }
 
   render() {
-    const category = this.props.match.params.name;
+    const category = this.props.match.params.category;
     let posts = this.props.posts;
+
+    
+
 
     if (Object.keys(posts).length == 0) {
       return (
@@ -55,6 +61,7 @@ class CategoryView extends Component {
     }
 
     posts = Object.keys(posts).map(id => posts[id]).filter(post => {
+      
       return post.category === category;
     });
 
@@ -74,7 +81,7 @@ class CategoryView extends Component {
       items = posts.map(post =>
         <li key={post.id}>
           <Post
-            detailed="false"
+            detailed={false}
             post={post}
             hist={this.props.history}
             votePost={this.props.votePost}

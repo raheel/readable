@@ -6,7 +6,7 @@ export const Category = props => {
   if (name == null) return <div />;
   return (
     <div>
-      <Link to={`/category/${name}`}>  {name} </Link>
+      <Link to={`/${name}`}>  {name} </Link>
     </div>
   );
 };
@@ -28,13 +28,14 @@ export const Post = props => {
       comment => comment.deleted !== "true" && comment.deleted !== true
     );
   }
-  let hasComments = filteredComments == null
+  let hasComments = filteredComments == null || filteredComments.length==0
     ? false
     : filteredComments.length > 0;
+    
 
   return (
     <div className="post">
-      <Link to={`/post/${post.id}`}><b>{post.title}</b></Link><br />
+      <Link to={`/${post.category}/${post.id}`}><b>{post.title}</b></Link><br />
       {post.body}<br />
       Author: {post.author}<br />
       Timestamp: {new Date(post.timestamp).toUTCString()}<br />
@@ -43,9 +44,11 @@ export const Post = props => {
       {detailed
         ? <div>
             Category:
-            <Link to={`/category/${post.category}`}>{post.category}</Link><br />
+            <Link to={`/${post.category}`}>{post.category}</Link><br />
 
             Owner: {post.owner}<br />
+
+            Number of Comments: {hasComments ? filteredComments.length : 0}
           </div>
         : <div />}
 
@@ -358,16 +361,13 @@ const editPostSubmit = (hist, id, editPost) => {
 };
 
 const addCommentSubmit = (hist, postId, addComment) => {
-  //
-  //
-
-  //
 
   const body = this.commentBodyInput.value;
   const author = this.commentAuthorInput.value;
   const parentId = postId;
   const timestamp = Date.now();
   const id = timestamp;
+  const deleted = false;
 
   if (!this.commentBodyInput.value || !this.commentAuthorInput.value) {
     return;
@@ -375,16 +375,11 @@ const addCommentSubmit = (hist, postId, addComment) => {
 
   window.event.preventDefault();
 
-  addComment(hist, { id, body, author, parentId, timestamp });
+  addComment(hist, { id, body, author, parentId, deleted, timestamp });
 
-  //
 };
 
 const editCommentSubmit = (hist, comment, editComment) => {
-  //
-  //
-
-  //
 
   const body = this.commentBodyInput.value;
   const timestamp = Date.now();

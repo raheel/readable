@@ -113,7 +113,7 @@ export function addPostRequest(history, post) {
   return (dispatch, getState) => {
     fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER)).then(() => {
       dispatch(addPost(post));
-      history.push("/category/" + category);
+      history.push("/" + category);
     });
   };
 }
@@ -139,8 +139,12 @@ export function deletePostRequest(history, post) {
       dispatch(deletePost(post.id));
       alert("Succesfully deleted post with title " + post.title);
 
-      if (history && history.location.pathname.startsWith("/post")) {
-        history.push("/category/" + post.category);
+      if (history) {
+        let count = (history.location.pathname.match(/\//g) || []).length;
+
+        if (count > 1) {
+          history.push("/" + post.category);
+        }
       }
     });
   };
@@ -158,16 +162,16 @@ export function votePostRequest(id, option) {
 }
 
 export function addCommentRequest(history, comment) {
-  let { id, author, body, parentId, timestamp } = comment;
+  let { id, author, body, parentId, timestamp, deleted} = comment;
   let url = "comments ";
   let postBody = {
-    body: JSON.stringify({ id, author, body, parentId, timestamp })
+    body: JSON.stringify({ id, author, body, parentId, deleted, timestamp })
   };
 
   return (dispatch, getState) => {
     fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER)).then(() => {
-      dispatch(addPost(comment));
-      history.push("/post/" + comment.parentId);
+      dispatch(addComment(comment));
+      history.push("/comment/" + comment.parentId);
     });
   };
 }
@@ -298,10 +302,10 @@ export function deleteComment(comment) {
   };
 }
 
-export function addComment({ comment }) {
+export function addComment(comment) {
   return {
     type: ADD_NEW_COMMENT,
-    id: comment.id
+    comment: comment
   };
 }
 

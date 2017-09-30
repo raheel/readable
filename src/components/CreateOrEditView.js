@@ -43,14 +43,6 @@ class CreateOrEditView extends Component {
     const addPost = this.props.addPost;
     const editPost = this.props.editPost;
     const post = this.props.posts[id];
-    console.log(
-      "----post id:",
-      id,
-      "keys",
-      Object.keys(this.props.posts),
-      "posts",
-      this.props.posts
-    );
 
     let comment = null;
 
@@ -58,11 +50,6 @@ class CreateOrEditView extends Component {
       for (let postId in this.props.comments) {
       }
     }
-
-    console.log(
-      "Object.keys(this.props.comments)",
-      Object.keys(this.props.comments)
-    );
 
     Object.keys(this.props.comments).map(postId => {
       this.props.comments[postId].map(c => {
@@ -72,14 +59,6 @@ class CreateOrEditView extends Component {
       });
     });
 
-    console.log(
-      "create and post",
-      isCreate,
-      isPost,
-      this.props.posts,
-      post,
-      addPost
-    );
     if (isCreate) {
       if (isPost) {
         return (

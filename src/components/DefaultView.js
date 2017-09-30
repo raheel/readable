@@ -19,8 +19,13 @@ class DefaultView extends Component {
   }
 
   componentDidMount() {
-    this.props.loadCategoriesRequest();
-    this.props.loadAllPosts();
+
+    if (Object.keys(this.props.categories).length==0){
+      this.props.loadCategoriesRequest();
+    }
+
+      this.props.loadAllPosts();
+
   }
 
   render() {
@@ -62,7 +67,7 @@ class DefaultView extends Component {
         return (
           <li key={post.id}>
             <Post
-              detailed="false"
+              detailed={false}
               post={post}
               hist={this.props.history}
               votePost={this.props.votePost}

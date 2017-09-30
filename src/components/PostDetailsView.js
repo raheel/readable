@@ -16,8 +16,13 @@ import { withRouter } from "react-router-dom";
 class PostDetailsView extends Component {
   componentDidMount() {
     const id = this.props.match.params.id;
+    if (!this.props.posts[id]){
     this.props.loadPost(id);
-    this.props.loadComments(id);
+    }
+  
+    if (!this.props.comments[id]){
+      this.props.loadComments(id);
+    }
   }
 
   render() {
@@ -80,5 +85,5 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default withRouter(
-  connect(mapStateTßoProps, mapDispatchToProps)(PostDetailsView)
+  connect(mapStateToProps, mapDispatchToProps)(PostDetailsView)
 );

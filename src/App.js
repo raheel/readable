@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Link} from "react-router-dom";
 import DefaultView from './components/DefaultView';
 import CategoryView from './components/CategoryView';
 import PostDetailsView from './components/PostDetailsView';
@@ -11,6 +11,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+      <Link to={`/`}><b>Home</b></Link><br />
 
 <Switch>
       <Route
@@ -23,7 +24,7 @@ class App extends Component {
 
       <Route
           exact
-          path="/category/:name"
+          path="/:category"
           render={props=> (
                   <CategoryView {...props}/>
           )}
@@ -31,7 +32,7 @@ class App extends Component {
 
       <Route
           exact
-          path="/post/:id"
+          path="/:category/:id"
           render={props=> (
                   <PostDetailsView {...props}/>
           )}
