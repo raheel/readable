@@ -1,13 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { loadPostRequest, editPostRequest, deletePostRequest, votePostRequest,
-loadCommentsRequest, editCommentRequest, deleteCommentRequest, voteCommentRequest} from "../actions";
+import {
+  loadPostRequest,
+  editPostRequest,
+  deletePostRequest,
+  votePostRequest,
+  loadCommentsRequest,
+  editCommentRequest,
+  deleteCommentRequest,
+  voteCommentRequest
+} from "../actions";
 import { Post, Comment } from "./ReadableComponents";
 import { withRouter } from "react-router-dom";
 
 class PostDetailsView extends Component {
   componentDidMount() {
-    console.log("-----------componentDidMount 1 ");
     const id = this.props.match.params.id;
     this.props.loadPost(id);
     this.props.loadComments(id);
@@ -18,8 +25,7 @@ class PostDetailsView extends Component {
     let posts = this.props.posts;
     let post = null;
 
-    console.log('=====render ', this.props)
-    if (posts==null || Object.keys(posts).length==0){
+    if (posts == null || Object.keys(posts).length == 0) {
       return null;
     }
 
@@ -30,10 +36,20 @@ class PostDetailsView extends Component {
     if (post != null) {
       return (
         <div>
-          <h1 style={{display: 'flex', justifyContent: 'center'}}>Post Details</h1>
-          <Post detailed="true" post={post} comments={comments} hist={this.props.history}
-          votePost={this.props.votePost} editPost={this.props.editPost} deletePost={this.props.deletePost}
-          voteComment={this.props.voteComment} deleteComment={this.props.deleteComment}/>
+          <h1 style={{ display: "flex", justifyContent: "center" }}>
+            Post Details
+          </h1>
+          <Post
+            detailed="true"
+            post={post}
+            comments={comments}
+            hist={this.props.history}
+            votePost={this.props.votePost}
+            editPost={this.props.editPost}
+            deletePost={this.props.deletePost}
+            voteComment={this.props.voteComment}
+            deleteComment={this.props.deleteComment}
+          />
         </div>
       );
     } else {
@@ -43,25 +59,26 @@ class PostDetailsView extends Component {
 }
 
 function mapStateToProps({ posts, comments }) {
-  console.log("$$$$$$$$$$$$$mapStateToProps ", posts, "________-test__-----");
   return {
     posts,
     comments
   };
 }
 
-
 function mapDispatchToProps(dispatch) {
   return {
     loadPost: id => dispatch(loadPostRequest(id)),
-    editPost: (hist, post) => dispatch(editPostRequest(hist, post)),    
-    deletePost: (hist, post) => dispatch(deletePostRequest(hist, post)),    
+    editPost: (hist, post) => dispatch(editPostRequest(hist, post)),
+    deletePost: (hist, post) => dispatch(deletePostRequest(hist, post)),
     votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
     loadComments: id => dispatch(loadCommentsRequest(id)),
-    editComment: comment => dispatch(editCommentRequest(comment)),    
-    deleteComment: (comment) => dispatch(deleteCommentRequest(comment)),    
-    voteComment: (postId, categoryId, mode) => dispatch(voteCommentRequest(postId, categoryId, mode)),        
+    editComment: comment => dispatch(editCommentRequest(comment)),
+    deleteComment: comment => dispatch(deleteCommentRequest(comment)),
+    voteComment: (postId, categoryId, mode) =>
+      dispatch(voteCommentRequest(postId, categoryId, mode))
   };
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(PostDetailsView));
+export default withRouter(
+  connect(mapStateTßoProps, mapDispatchToProps)(PostDetailsView)
+);

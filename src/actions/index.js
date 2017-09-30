@@ -20,32 +20,32 @@ const BASE_URL = "http://localhost:5001/";
 const GET_HEADER = {
   method: "GET",
   headers: {
-    'Authorization': 'whatever-you-want'
+    Authorization: "whatever-you-want"
   }
 };
 
 const POST_HEADER = {
   method: "POST",
   headers: {
-    'Authorization': 'whatever-you-want',
-    'Accept': 'application/json, text/plain, */*',
-    'Content-Type': 'application/json'
+    Authorization: "whatever-you-want",
+    Accept: "application/json, text/plain, */*",
+    "Content-Type": "application/json"
   }
 };
 
 const PUT_HEADER = {
   method: "PUT",
   headers: {
-    'Authorization': 'whatever-you-want',
-    'Accept': 'application/json, text/plain, */*',
-    'Content-Type': 'application/json'    
+    Authorization: "whatever-you-want",
+    Accept: "application/json, text/plain, */*",
+    "Content-Type": "application/json"
   }
 };
 
 const DELETE_HEADER = {
   method: "DELETE",
   headers: {
-    'Authorization': 'whatever-you-want'
+    Authorization: "whatever-you-want"
   }
 };
 //Network Requests
@@ -104,117 +104,110 @@ export function loadCommentRequest(id) {
 }
 
 export function addPostRequest(history, post) {
-    console.log('addPostRequest', history, post);
-  let {id, title, body, owner, category, timestamp} = post;
-  let url = 'posts';
-  let postBody = {body: JSON.stringify({ id, title, body, owner, category, timestamp })};
-  console.log('postBody: ', postBody);
+  let { id, title, body, owner, category, timestamp } = post;
+  let url = "posts";
+  let postBody = {
+    body: JSON.stringify({ id, title, body, owner, category, timestamp })
+  };
+
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
-      .then(() => {
-        dispatch(addPost(post));
-        history.push('/category/'+category  );
-      });
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER)).then(() => {
+      dispatch(addPost(post));
+      history.push("/category/" + category);
+    });
   };
 }
 
 export function editPostRequest(history, post) {
-  console.log('test_____________editPostRequest: post', post);
-  let url = "posts/" + post.id ;
+  let url = "posts/" + post.id;
 
-  let postBody = {body: JSON.stringify(post)};
+  let postBody = { body: JSON.stringify(post) };
 
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER))
-      .then(() => {
-        dispatch(editPost(post));
-        history.goBack();
-      });
+    fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER)).then(() => {
+      dispatch(editPost(post));
+      history.goBack();
+    });
   };
 }
 
 export function deletePostRequest(history, post) {
-  let url = "posts/" + post.id ;
+  let url = "posts/" + post.id;
 
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, DELETE_HEADER)
-      .then(() => {
-        dispatch(deletePost(post.id));
-        alert('Succesfully deleted post with title ' + post.title);
-        console.log('history', history);
-        if (history && history.location.pathname.startsWith('/post')){
-          history.push('/category/'+post.category);
-        }
+    fetch(BASE_URL + url, DELETE_HEADER).then(() => {
+      dispatch(deletePost(post.id));
+      alert("Succesfully deleted post with title " + post.title);
 
-      });    
+      if (history && history.location.pathname.startsWith("/post")) {
+        history.push("/category/" + post.category);
+      }
+    });
   };
 }
 
 export function votePostRequest(id, option) {
-  let url = "posts/" + id ;
-  let postBody = {body: JSON.stringify({option})};
+  let url = "posts/" + id;
+  let postBody = { body: JSON.stringify({ option }) };
 
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
-      .then(dispatch(votePost({id, option})));
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER)).then(
+      dispatch(votePost({ id, option }))
+    );
   };
 }
 
-
 export function addCommentRequest(history, comment) {
-    console.log('addCommentRequest', history, comment);
-  let {id, author, body, parentId, timestamp} = comment;
-  let url = 'comments ';
-  let postBody = {body: JSON.stringify({id, author, body, parentId, timestamp})};
-  console.log('postBody: ', postBody);
+  let { id, author, body, parentId, timestamp } = comment;
+  let url = "comments ";
+  let postBody = {
+    body: JSON.stringify({ id, author, body, parentId, timestamp })
+  };
+
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
-      .then(() => {
-        dispatch(addPost(comment));
-        history.push('/post/'+comment.parentId  );
-      });
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER)).then(() => {
+      dispatch(addPost(comment));
+      history.push("/post/" + comment.parentId);
+    });
   };
 }
 
 export function editCommentRequest(history, comment) {
-  console.log('editCommentRequest: comment', history, comment);
-  let url = "comments/" + comment.id ;
+  let url = "comments/" + comment.id;
 
-  let postBody = {body: JSON.stringify(comment)};
+  let postBody = { body: JSON.stringify(comment) };
 
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER))
-      .then(() => {
-                  console.log('editCommentRequest pushing history1: ');
+    fetch(BASE_URL + url, Object.assign({}, postBody, PUT_HEADER)).then(() => {
+      dispatch(editComment(comment));
 
-        dispatch(editComment(comment));
-          console.log('editCommentRequest pushing history2: ');
-
-        history.push('/post/'+comment.parentId  );
-      });
+      history.push("/post/" + comment.parentId);
+    });
   };
 }
 
 export function deleteCommentRequest(comment) {
-  let url = "comments/" + comment.id ;
+  let url = "comments/" + comment.id;
 
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, DELETE_HEADER)
-      .then(() => {
-        dispatch(deleteComment(comment));
-        alert('Succesfully deleted comment starting with ' + comment.body.substring(0, 10));
-      });    
-  };}
+    fetch(BASE_URL + url, DELETE_HEADER).then(() => {
+      dispatch(deleteComment(comment));
+      alert(
+        "Succesfully deleted comment starting with " +
+          comment.body.substring(0, 10)
+      );
+    });
+  };
+}
 
 export function voteCommentRequest(postId, commentId, option) {
-  console.log('voteCommentRequest postId, commentId, option', postId, commentId, option);
-  let url = "comments/" +commentId ;
-  let postBody = {body: JSON.stringify({option})};
+  let url = "comments/" + commentId;
+  let postBody = { body: JSON.stringify({ option }) };
 
   return (dispatch, getState) => {
-    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER))
-      .then(
-        dispatch(voteComment({postId, commentId, option})));
+    fetch(BASE_URL + url, Object.assign({}, postBody, POST_HEADER)).then(
+      dispatch(voteComment({ postId, commentId, option }))
+    );
   };
 }
 
@@ -248,8 +241,6 @@ export function sortPosts({ sortBy }) {
 }
 
 export function editPost(post) {
-    console.log('editPost: post', post);
-
   return {
     type: EDIT_POST,
     post
@@ -270,7 +261,7 @@ export function addPost(post) {
   };
 }
 
-export function votePost({id, option}) {
+export function votePost({ id, option }) {
   return {
     type: VOTE_POST,
     id,
@@ -278,9 +269,7 @@ export function votePost({id, option}) {
   };
 }
 
-
 export function loadComments({ id, comments }) {
-  console.log('----comments, ', comments);
   return {
     type: LOAD_COMMENTS,
     id,
@@ -289,7 +278,6 @@ export function loadComments({ id, comments }) {
 }
 
 export function loadComment(comment) {
-  console.log('----comment, ', comment);
   return {
     type: LOAD_COMMENT,
     comment
@@ -317,7 +305,7 @@ export function addComment({ comment }) {
   };
 }
 
-export function voteComment({postId, commentId, option}) {
+export function voteComment({ postId, commentId, option }) {
   return {
     type: VOTE_COMMENT,
     postId,
@@ -325,4 +313,3 @@ export function voteComment({postId, commentId, option}) {
     option
   };
 }
-
