@@ -16,14 +16,14 @@ export const Post = props => {
 
   if (post == null || post.deleted != false) return <div />;
 
-  if (comments != null) {
+  if (comments != null && Array.isArray(comments)) {
     comments.sort(
       (comment1, comment2) => comment2.voteScore - comment1.voteScore
     );
   }
 
   let filteredComments = null;
-  if (comments != null) {
+  if (comments != null && Array.isArray(comments)) {
     filteredComments = comments.filter(
       comment => comment.deleted !== "true" && comment.deleted !== true
     );
@@ -40,6 +40,7 @@ export const Post = props => {
       Author: {post.author}<br />
       Timestamp: {new Date(post.timestamp).toUTCString()}<br />
       Vote Score: {post.voteScore}<br />
+      Number of Comments: {hasComments ? filteredComments.length : 0}
 
       {detailed
         ? <div>
@@ -48,7 +49,6 @@ export const Post = props => {
 
             Owner: {post.owner}<br />
 
-            Number of Comments: {hasComments ? filteredComments.length : 0}
           </div>
         : <div />}
 
@@ -86,7 +86,7 @@ export const Post = props => {
         Downvote
       </button>
 
-      {filteredComments != null
+      {filteredComments != null && detailed
         ? <div>
             <br /><br /><br /><br />
             <b> {!hasComments ? "No" : ""} Comments</b><br />

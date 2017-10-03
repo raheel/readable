@@ -46,11 +46,6 @@ class CreateOrEditView extends Component {
 
     let comment = null;
 
-    if (this.props.comments != null) {
-      for (let postId in this.props.comments) {
-      }
-    }
-
     Object.keys(this.props.comments).map(postId => {
       this.props.comments[postId].map(c => {
         if (c.id == id) {

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   loadPostsRequest,
+  loadCommentsRequest,
   editPostRequest,
   deletePostRequest,
   votePostRequest
@@ -20,12 +21,10 @@ class CategoryView extends Component {
   }
 
   componentDidMount() {
-    
     const category = this.props.match.params.category;
-    
+
     this.props.loadPosts(category);
 
-  
     newPostButton = (
       <Route
         render={({ history }) =>
@@ -44,9 +43,7 @@ class CategoryView extends Component {
   render() {
     const category = this.props.match.params.category;
     let posts = this.props.posts;
-
-    
-
+    let comments = this.props.comments;
 
     if (Object.keys(posts).length == 0) {
       return (
@@ -61,9 +58,22 @@ class CategoryView extends Component {
     }
 
     posts = Object.keys(posts).map(id => posts[id]).filter(post => {
-      
       return post.category === category;
     });
+
+    if (
+      posts != null &&
+      Object.keys(posts).length != 0 &&
+      Object.keys(comments).length == 0
+    ) {
+      Object.keys(posts).forEach((id, index) => {
+        let post = posts[id];
+
+        if (!post.deleted) {
+          this.props.loadComments(post.id);
+        }
+      });
+    }
 
     posts = this.sortPosts(this.state.sortBy, posts);
 
@@ -83,6 +93,7 @@ class CategoryView extends Component {
           <Post
             detailed={false}
             post={post}
+            comments={this.props.comments ? this.props.comments[post.id] : null}
             hist={this.props.history}
             votePost={this.props.votePost}
             editPost={this.props.editPost}
@@ -132,9 +143,10 @@ class CategoryView extends Component {
   }
 }
 
-function mapStateToProps({ posts }) {
+function mapStateToProps({ posts, comments }) {
   return {
-    posts
+    posts,
+    comments
   };
 }
 
@@ -144,7 +156,8 @@ function mapDispatchToProps(dispatch) {
     editPost: (hist, post) => dispatch(editPostRequest(hist, post)),
     deletePost: (displayFunction, id) =>
       dispatch(deletePostRequest(displayFunction, id)),
-    votePost: (id, mode) => dispatch(votePostRequest(id, mode))
+    votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
+    loadComments: id => dispatch(loadCommentsRequest(id))
   };
 }
 

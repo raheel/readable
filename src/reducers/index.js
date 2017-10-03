@@ -149,6 +149,7 @@ function comments(state = {}, action) {
     }
     case ADD_NEW_COMMENT: {
       let newState = Object.assign({}, state);
+      action.comment.voteScore = 0;
       if (action.comment.parentId in newState) {
         newState[action.comment.parentId].push(action.comment);
       } else {

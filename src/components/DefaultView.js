@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import {
   loadCategoriesRequest,
   loadPostsRequest,
+  loadCommentsRequest,
   editPostRequest,
   deletePostRequest,
   votePostRequest
@@ -19,18 +20,26 @@ class DefaultView extends Component {
   }
 
   componentDidMount() {
-
-    if (Object.keys(this.props.categories).length==0){
+    if (Object.keys(this.props.categories).length == 0) {
       this.props.loadCategoriesRequest();
     }
 
-      this.props.loadAllPosts();
-
+    this.props.loadAllPosts();
   }
 
   render() {
     const categories = this.props.categories.categories;
     const posts = this.props.posts;
+
+    if (posts != null && Object.keys(posts).length != 0) {
+      Object.keys(posts).forEach((id, index) => {
+        let post = posts[id];
+
+        if (!post.deleted) {
+          this.props.loadComments(post.id);
+        }
+      });
+    }
 
     return (
       <div>
@@ -63,12 +72,16 @@ class DefaultView extends Component {
   displayPosts(posts) {
     {
       let items = posts.map(post => {
+        let comments = this.props.comments
+          ? this.props.comments[post.id]
+          : null;
 
         return (
           <li key={post.id}>
             <Post
               detailed={false}
               post={post}
+              comments={comments}
               hist={this.props.history}
               votePost={this.props.votePost}
               editPost={this.props.editPost}
@@ -124,10 +137,11 @@ class DefaultView extends Component {
   }
 }
 
-function mapStateToProps({ categories, posts }) {
+function mapStateToProps({ categories, posts, comments }) {
   return {
     categories,
-    posts
+    posts,
+    comments
   };
 }
 
@@ -137,7 +151,8 @@ function mapDispatchToProps(dispatch) {
     loadAllPosts: () => dispatch(loadPostsRequest("all")),
     editPost: (hist, post) => dispatch(editPostRequest(hist, post)),
     deletePost: (hist, post) => dispatch(deletePostRequest(hist, post)),
-    votePost: (id, mode) => dispatch(votePostRequest(id, mode))
+    votePost: (id, mode) => dispatch(votePostRequest(id, mode)),
+    loadComments: id => dispatch(loadCommentsRequest(id))
   };
 }
 
