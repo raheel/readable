@@ -30,8 +30,9 @@ class DefaultView extends Component {
   render() {
     const categories = this.props.categories.categories;
     const posts = this.props.posts;
+    const comments = this.props.comments;
 
-    if (posts != null && Object.keys(posts).length != 0) {
+    if (posts != null && Object.keys(posts).length != 0 && Object.keys(comments).length == 0) {
       Object.keys(posts).forEach((id, index) => {
         let post = posts[id];
 
